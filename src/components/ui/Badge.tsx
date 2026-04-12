@@ -1,0 +1,23 @@
+import type { ReactNode } from 'react'
+
+interface BadgeProps {
+  children: ReactNode
+  color?: 'gray' | 'blue' | 'green' | 'yellow' | 'red' | 'orange'
+  className?: string
+}
+
+export function Badge({ children, color = 'gray', className = '' }: BadgeProps) {
+  const colors = {
+    gray:   'bg-base-300 text-base-content/60',
+    blue:   'bg-primary/10 text-blue-700',
+    green:  'bg-green-50 text-green-700',
+    yellow: 'bg-yellow-50 text-yellow-700',
+    red:    'bg-red-50 text-red-700',
+    orange: 'bg-orange-50 text-orange-700',
+  }
+  return (
+    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${colors[color]} ${className}`}>
+      {children}
+    </span>
+  )
+}

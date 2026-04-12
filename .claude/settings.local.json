@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(curl -s http://localhost:5173)",
+      "Bash(curl -s http://localhost:5173/password)",
+      "Bash(node -e \"const { toHijri, toGregorian } = require\\('hijri-converter'\\); const h = toHijri\\(2026, 4, 8\\); console.log\\('2026-04-08 Gregorian =', h.hy + '/' + h.hm + '/' + h.hd, 'Hijri'\\); const g = toGregorian\\(h.hy, h.hm, h.hd\\); console.log\\('Back to Gregorian:', g.gy + '/' + g.gm + '/' + g.gd\\);\")",
+      "Bash(pkill -f \"vite\")",
+      "Bash(xargs sed:*)"
+    ]
+  }
+}

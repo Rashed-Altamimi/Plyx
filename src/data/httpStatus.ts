@@ -1,0 +1,79 @@
+export interface HttpStatusEntry {
+  code: number
+  name: string
+  description: string
+  category: '1xx' | '2xx' | '3xx' | '4xx' | '5xx'
+}
+
+export const HTTP_STATUS_CODES: HttpStatusEntry[] = [
+  // 1xx
+  { code: 100, name: 'Continue', category: '1xx', description: 'The server has received the request headers and the client should proceed to send the request body.' },
+  { code: 101, name: 'Switching Protocols', category: '1xx', description: 'The server is switching protocols as requested by the client.' },
+  { code: 102, name: 'Processing', category: '1xx', description: 'The server has received and is processing the request, but no response is available yet.' },
+  { code: 103, name: 'Early Hints', category: '1xx', description: 'Used to return some response headers before the final HTTP message.' },
+
+  // 2xx
+  { code: 200, name: 'OK', category: '2xx', description: 'The request has succeeded.' },
+  { code: 201, name: 'Created', category: '2xx', description: 'The request has been fulfilled and a new resource has been created.' },
+  { code: 202, name: 'Accepted', category: '2xx', description: 'The request has been accepted for processing, but processing has not been completed.' },
+  { code: 203, name: 'Non-Authoritative Information', category: '2xx', description: 'The returned metadata is not the definitive set from the origin server.' },
+  { code: 204, name: 'No Content', category: '2xx', description: 'The server successfully processed the request and is not returning any content.' },
+  { code: 205, name: 'Reset Content', category: '2xx', description: 'The server successfully processed the request but is not returning any content. Reset document view.' },
+  { code: 206, name: 'Partial Content', category: '2xx', description: 'The server is delivering only part of the resource due to a range header sent by the client.' },
+  { code: 207, name: 'Multi-Status', category: '2xx', description: 'The message body that follows is an XML message and can contain a number of separate response codes.' },
+  { code: 208, name: 'Already Reported', category: '2xx', description: 'The members of a DAV binding have already been enumerated in a previous reply.' },
+  { code: 226, name: 'IM Used', category: '2xx', description: 'The server has fulfilled a GET request for the resource.' },
+
+  // 3xx
+  { code: 300, name: 'Multiple Choices', category: '3xx', description: 'The request has more than one possible response.' },
+  { code: 301, name: 'Moved Permanently', category: '3xx', description: 'The URL of the requested resource has been changed permanently.' },
+  { code: 302, name: 'Found', category: '3xx', description: 'The resource is temporarily located at a different URI.' },
+  { code: 303, name: 'See Other', category: '3xx', description: 'The server sent this response to direct the client to get the requested resource at another URI with a GET request.' },
+  { code: 304, name: 'Not Modified', category: '3xx', description: 'Indicates that the resource has not been modified since the version specified by the request headers.' },
+  { code: 307, name: 'Temporary Redirect', category: '3xx', description: 'The resource is temporarily at a different URI — use the same HTTP method.' },
+  { code: 308, name: 'Permanent Redirect', category: '3xx', description: 'The resource has been permanently moved — use the same HTTP method.' },
+
+  // 4xx
+  { code: 400, name: 'Bad Request', category: '4xx', description: 'The server cannot process the request due to a client error (malformed syntax).' },
+  { code: 401, name: 'Unauthorized', category: '4xx', description: 'Authentication is required and has failed or has not yet been provided.' },
+  { code: 402, name: 'Payment Required', category: '4xx', description: 'Reserved for future use.' },
+  { code: 403, name: 'Forbidden', category: '4xx', description: 'The server understood the request but refuses to authorize it.' },
+  { code: 404, name: 'Not Found', category: '4xx', description: 'The server cannot find the requested resource.' },
+  { code: 405, name: 'Method Not Allowed', category: '4xx', description: 'The request method is known but not supported by the target resource.' },
+  { code: 406, name: 'Not Acceptable', category: '4xx', description: 'The server cannot produce a response matching the list of acceptable values.' },
+  { code: 407, name: 'Proxy Authentication Required', category: '4xx', description: 'The client must first authenticate itself with the proxy.' },
+  { code: 408, name: 'Request Timeout', category: '4xx', description: 'The server did not receive a complete request within the expected time.' },
+  { code: 409, name: 'Conflict', category: '4xx', description: 'The request conflicts with the current state of the server.' },
+  { code: 410, name: 'Gone', category: '4xx', description: 'The requested resource is no longer available and will not be available again.' },
+  { code: 411, name: 'Length Required', category: '4xx', description: 'The request did not specify the length of its content, which is required.' },
+  { code: 412, name: 'Precondition Failed', category: '4xx', description: 'The server does not meet one of the preconditions specified in the request headers.' },
+  { code: 413, name: 'Payload Too Large', category: '4xx', description: 'The request is larger than the server is willing or able to process.' },
+  { code: 414, name: 'URI Too Long', category: '4xx', description: 'The URI provided is too long for the server to process.' },
+  { code: 415, name: 'Unsupported Media Type', category: '4xx', description: 'The media format of the requested data is not supported by the server.' },
+  { code: 416, name: 'Range Not Satisfiable', category: '4xx', description: 'The range specified by the Range header cannot be fulfilled.' },
+  { code: 417, name: 'Expectation Failed', category: '4xx', description: 'The server cannot meet the requirements of the Expect request-header.' },
+  { code: 418, name: "I'm a teapot", category: '4xx', description: 'The server refuses to brew coffee because it is, permanently, a teapot.' },
+  { code: 421, name: 'Misdirected Request', category: '4xx', description: 'The request was directed at a server that cannot produce a response.' },
+  { code: 422, name: 'Unprocessable Entity', category: '4xx', description: 'The request was well-formed but was unable to be followed due to semantic errors.' },
+  { code: 423, name: 'Locked', category: '4xx', description: 'The resource being accessed is locked.' },
+  { code: 424, name: 'Failed Dependency', category: '4xx', description: 'The request failed because it depended on another request which failed.' },
+  { code: 425, name: 'Too Early', category: '4xx', description: 'The server is unwilling to risk processing a request that might be replayed.' },
+  { code: 426, name: 'Upgrade Required', category: '4xx', description: 'The client should switch to a different protocol.' },
+  { code: 428, name: 'Precondition Required', category: '4xx', description: 'The origin server requires the request to be conditional.' },
+  { code: 429, name: 'Too Many Requests', category: '4xx', description: 'The user has sent too many requests in a given amount of time (rate limiting).' },
+  { code: 431, name: 'Request Header Fields Too Large', category: '4xx', description: 'The server is unwilling to process the request because its header fields are too large.' },
+  { code: 451, name: 'Unavailable For Legal Reasons', category: '4xx', description: 'The server cannot deliver the resource because of legal reasons.' },
+
+  // 5xx
+  { code: 500, name: 'Internal Server Error', category: '5xx', description: 'The server has encountered a situation it does not know how to handle.' },
+  { code: 501, name: 'Not Implemented', category: '5xx', description: 'The request method is not supported by the server and cannot be handled.' },
+  { code: 502, name: 'Bad Gateway', category: '5xx', description: 'The server, while acting as a gateway or proxy, received an invalid response from an upstream server.' },
+  { code: 503, name: 'Service Unavailable', category: '5xx', description: 'The server is not ready to handle the request. Often due to maintenance or overload.' },
+  { code: 504, name: 'Gateway Timeout', category: '5xx', description: 'The server, while acting as a gateway, did not receive a timely response from the upstream server.' },
+  { code: 505, name: 'HTTP Version Not Supported', category: '5xx', description: 'The HTTP version used in the request is not supported by the server.' },
+  { code: 506, name: 'Variant Also Negotiates', category: '5xx', description: 'The server has an internal configuration error: transparent content negotiation for the request results in a circular reference.' },
+  { code: 507, name: 'Insufficient Storage', category: '5xx', description: 'The server is unable to store the representation needed to complete the request.' },
+  { code: 508, name: 'Loop Detected', category: '5xx', description: 'The server detected an infinite loop while processing the request.' },
+  { code: 510, name: 'Not Extended', category: '5xx', description: 'Further extensions to the request are required for the server to fulfill it.' },
+  { code: 511, name: 'Network Authentication Required', category: '5xx', description: 'The client needs to authenticate to gain network access.' },
+]
