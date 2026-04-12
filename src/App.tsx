@@ -179,9 +179,14 @@ function RoutesShell() {
   )
 }
 
+// Strip trailing slash from Vite's BASE_URL for React Router.
+// In dev BASE_URL is '/', so basename becomes ''.
+// In prod BASE_URL is '/Plex/', so basename becomes '/Plex'.
+const basename = import.meta.env.BASE_URL.replace(/\/$/, '')
+
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <AppShell>
         <RoutesShell />
       </AppShell>
