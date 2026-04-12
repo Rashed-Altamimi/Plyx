@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Star } from 'lucide-react'
+import { Star } from '../../icons'
 import type { NavItem as NavItemType } from '../../constants/navigation'
 import { useFavorites } from '../../hooks/useFavorites'
 

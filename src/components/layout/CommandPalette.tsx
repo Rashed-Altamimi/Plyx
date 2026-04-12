@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Search, Star, Clock, ArrowRight, X } from 'lucide-react'
+import { Search, Star, Clock, ArrowRight, X } from '../../icons'
 import { buildToolIndex, filterAndRank, type ToolEntry } from '../../utils/toolSearch'
 import { useFavorites } from '../../hooks/useFavorites'
 import { useRecents } from '../../hooks/useRecents'

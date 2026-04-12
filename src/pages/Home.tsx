@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Search, Star, Clock } from 'lucide-react'
+import { Search, Star, Clock } from '../icons'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 import { NAV_CATEGORIES } from '../constants/navigation'
 import { useFavorites } from '../hooks/useFavorites'

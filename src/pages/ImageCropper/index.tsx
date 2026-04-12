@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, type PointerEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Download } from 'lucide-react'
+import { Download } from '../../icons'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { Card } from '../../components/ui/Card'
 import { FileDropzone } from '../../components/ui/FileDropzone'

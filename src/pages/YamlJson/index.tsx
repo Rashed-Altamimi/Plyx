@@ -10,7 +10,7 @@ import { CopyButton } from '../../components/ui/CopyButton'
 export function YamlJson() {
   const { t } = useTranslation()
   useDocumentTitle(t('yaml.title'))
-  const [yamlText, setYamlText] = useState('name: Plex\nversion: 1.0\nfeatures:\n  - tools\n  - i18n\n  - themes')
+  const [yamlText, setYamlText] = useState('name: Plyx\nversion: 1.0\nfeatures:\n  - tools\n  - i18n\n  - themes')
   const [jsonText, setJsonText] = useState('')
   const [yamlError, setYamlError] = useState('')
   const [jsonError, setJsonError] = useState('')

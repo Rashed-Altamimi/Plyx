@@ -2,8 +2,8 @@ import { useState, useMemo, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Ruler, Weight, Thermometer, FlaskConical, Gauge, Square, Clock, ArrowLeftRight,
-} from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
+} from '../../icons'
+import type { LucideIcon } from '../../icons'
 // @ts-expect-error - no types for convert-units
 import convertModule from 'convert-units'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'

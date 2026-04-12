@@ -183,7 +183,7 @@ const en = {
   },
 
   home: {
-    title: 'Welcome to Plex',
+    title: 'Welcome to Plyx',
     searchPlaceholder: 'Search 62 tools…',
     openPalette: 'Press ⌘K to open',
     pinned: 'Pinned',
@@ -215,6 +215,14 @@ const en = {
   tooltip: {
     addFavorite: 'Add to favorites',
     removeFavorite: 'Remove from favorites',
+  },
+
+  analytics: {
+    label: 'Analytics',
+    on: 'on',
+    off: 'off',
+    enable: 'Enable anonymous visit counting',
+    disable: 'Disable anonymous visit counting',
   },
 
   password: {
@@ -648,7 +656,7 @@ const en = {
     fetchFailed: 'Could not fetch rates. Showing cached data.',
     noCache: 'Unable to load rates. Please check your connection and retry.',
     retry: 'Retry',
-    networkNotice: 'This tool fetches exchange rates from a public API. It is the only Plex tool that sends data over the network.',
+    networkNotice: 'This tool fetches exchange rates from a public API. It is the only Plyx tool that sends data over the network.',
   },
 
   roman: {

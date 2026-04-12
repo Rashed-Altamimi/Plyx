@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Download } from 'lucide-react'
+import { Download } from '../../icons'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { Tabs } from '../../components/ui/Tabs'
 import { Card } from '../../components/ui/Card'

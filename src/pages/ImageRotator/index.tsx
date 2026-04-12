@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Download, RotateCcw, RotateCw, FlipHorizontal2, FlipVertical2 } from 'lucide-react'
+import { Download, RotateCcw, RotateCw, FlipHorizontal2, FlipVertical2 } from '../../icons'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { Card } from '../../components/ui/Card'
 import { FileDropzone } from '../../components/ui/FileDropzone'

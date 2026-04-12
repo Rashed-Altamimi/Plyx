@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { RefreshCw } from 'lucide-react'
+import { RefreshCw } from '../../icons'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { Card } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'

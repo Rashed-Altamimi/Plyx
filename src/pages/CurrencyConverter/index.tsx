@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeftRight, RefreshCw } from 'lucide-react'
+import { ArrowLeftRight, RefreshCw } from '../../icons'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { Card } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
@@ -9,7 +9,7 @@ import { Button } from '../../components/ui/Button'
 import { Badge } from '../../components/ui/Badge'
 import { getCached, getCachedStale, setCached } from '../../utils/localStorageCache'
 
-const CACHE_KEY = 'plex-currency-rates'
+const CACHE_KEY = 'plyx-currency-rates'
 const CACHE_TTL = 60 * 60 * 1000 // 1 hour
 const API_URL = 'https://open.er-api.com/v6/latest/USD'
 

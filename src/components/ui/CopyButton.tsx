@@ -1,4 +1,4 @@
-import { Check, Copy } from 'lucide-react'
+import { Check, Copy } from '../../icons'
 import { useTranslation } from 'react-i18next'
 import { useClipboard } from '../../hooks/useClipboard'
 import { Button } from './Button'

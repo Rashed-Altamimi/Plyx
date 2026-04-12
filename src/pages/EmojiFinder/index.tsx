@@ -13,7 +13,7 @@ const CATEGORY_I18N: Record<string, string> = {
   food: 'food', travel: 'travel', activities: 'activities',
   objects: 'objects', symbols: 'symbols', flags: 'flags',
 }
-const RECENT_KEY = 'plex-emoji-recent'
+const RECENT_KEY = 'plyx-emoji-recent'
 
 export function EmojiFinder() {
   const { t } = useTranslation()

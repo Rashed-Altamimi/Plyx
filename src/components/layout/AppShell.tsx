@@ -3,6 +3,7 @@ import { Sidebar } from './Sidebar'
 import { MobileHeader } from './MobileHeader'
 import { CommandPalette } from './CommandPalette'
 import { RouteTracker } from './RouteTracker'
+import { AnalyticsTracker } from './AnalyticsTracker'
 import { useDirection } from '../../hooks/useDirection'
 import { useCommandPalette } from '../../hooks/useCommandPalette'
 
@@ -17,6 +18,7 @@ export function AppShell({ children }: AppShellProps) {
   return (
     <div className="flex min-h-screen bg-base-200">
       <RouteTracker />
+      <AnalyticsTracker />
       <CommandPalette open={open} onClose={closePalette} />
       <div className="hidden md:flex">
         <Sidebar />

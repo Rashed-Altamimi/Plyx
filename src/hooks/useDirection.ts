@@ -14,7 +14,7 @@ export function useDirection() {
       const d = getDirection(lng)
       document.documentElement.dir = d
       document.documentElement.lang = lng
-      localStorage.setItem('plex-lang', lng)
+      localStorage.setItem('plyx-lang', lng)
     }
     i18n.on('languageChanged', handleChange)
     return () => { i18n.off('languageChanged', handleChange) }

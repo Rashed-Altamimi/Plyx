@@ -2,9 +2,9 @@ import { useEffect } from 'react'
 
 export function useDocumentTitle(title: string) {
   useEffect(() => {
-    document.title = title ? `${title} — Plex` : 'Plex'
+    document.title = title ? `${title} — Plyx` : 'Plyx'
     return () => {
-      document.title = 'Plex'
+      document.title = 'Plyx'
     }
   }, [title])
 }

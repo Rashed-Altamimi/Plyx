@@ -1,5 +1,5 @@
 import { useRef, useState, type DragEvent, type ChangeEvent } from 'react'
-import { Upload } from 'lucide-react'
+import { Upload } from '../../icons'
 
 interface FileDropzoneProps {
   accept?: string

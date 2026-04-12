@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 
-const STORAGE_KEY = 'plex-favorites'
+const STORAGE_KEY = 'plyx-favorites'
 
 function load(): string[] {
   try {

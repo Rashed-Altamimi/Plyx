@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Palette } from 'lucide-react'
+import { Palette } from '../../icons'
 import { useTranslation } from 'react-i18next'
 import { useTheme, THEMES } from '../../hooks/useTheme'
 

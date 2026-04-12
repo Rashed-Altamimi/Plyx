@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import QRCode from 'qrcode'
-import { Download } from 'lucide-react'
+import { Download } from '../../icons'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { buildWifiString, buildVCardString, type QrTab, type WifiData, type VCardData } from '../../utils/qr'
 import { Tabs } from '../../components/ui/Tabs'

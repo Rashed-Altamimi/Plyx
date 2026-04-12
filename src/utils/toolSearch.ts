@@ -1,4 +1,4 @@
-import type { LucideIcon } from 'lucide-react'
+import type { LucideIcon } from '../icons'
 import type { TFunction } from 'i18next'
 import { NAV_CATEGORIES } from '../constants/navigation'
 

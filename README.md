@@ -1,4 +1,4 @@
-# Plex
+# Plyx
 
 A collection of **62 utility tools** that run entirely in your browser. No data ever leaves your device.
 
@@ -133,7 +133,7 @@ src/
 
 ## Privacy
 
-Plex is designed to run **entirely in your browser**. There is no analytics, no telemetry, no backend. The only tool that makes a network request is the **Currency Converter**, which fetches public exchange rates from a free API and clearly discloses this on the page.
+Plyx is designed to run **entirely in your browser**. There is no analytics, no telemetry, no backend. The only tool that makes a network request is the **Currency Converter**, which fetches public exchange rates from a free API and clearly discloses this on the page.
 
 All your data — input text, files, favorites, theme, language preference — stays on your device.
 

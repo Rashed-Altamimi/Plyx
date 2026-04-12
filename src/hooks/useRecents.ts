@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 
-const STORAGE_KEY = 'plex-recents'
+const STORAGE_KEY = 'plyx-recents'
 const MAX_RECENTS = 5
 
 function load(): string[] {

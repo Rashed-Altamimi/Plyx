@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react'
-import { Menu, X, Wrench, Globe, Search, ChevronDown, Star } from 'lucide-react'
+import { Menu, X, Wrench, Globe, Search, ChevronDown, Star } from '../../icons'
 import { useTranslation } from 'react-i18next'
 import { HOME_ITEM, NAV_CATEGORIES } from '../../constants/navigation'
 import { LANGUAGES } from '../../i18n'
 import { NavItem } from './NavItem'
 import { ThemeSwitcher } from './ThemeSwitcher'
+import { AnalyticsToggle } from './AnalyticsToggle'
 import { useFavorites } from '../../hooks/useFavorites'
 import { useCollapsedCategories } from '../../hooks/useCollapsedCategories'
 import { useCommandPalette } from '../../hooks/useCommandPalette'
@@ -44,7 +45,7 @@ export function MobileHeader() {
           <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
             <Wrench size={14} className="text-primary-content" />
           </div>
-          <span className="font-semibold text-base-content">Plex</span>
+          <span className="font-semibold text-base-content">Plyx</span>
         </div>
         <div className="flex items-center gap-1">
           <button
@@ -74,7 +75,7 @@ export function MobileHeader() {
             <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
               <Wrench size={14} className="text-primary-content" />
             </div>
-            <span className="font-semibold text-base-content">Plex</span>
+            <span className="font-semibold text-base-content">Plyx</span>
           </div>
           <button onClick={close} className="p-1.5 rounded-lg hover:bg-base-200" aria-label="Close menu">
             <X size={16} />
@@ -150,6 +151,7 @@ export function MobileHeader() {
               <span>{currentLang?.label}</span>
             </button>
           </div>
+          <AnalyticsToggle />
         </div>
       </div>
     </>

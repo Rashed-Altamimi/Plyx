@@ -4,7 +4,7 @@ import en from './en'
 import ar from './ar'
 
 const savedLang = typeof localStorage !== 'undefined'
-  ? localStorage.getItem('plex-lang') || 'en'
+  ? localStorage.getItem('plyx-lang') || 'en'
   : 'en'
 
 i18n.use(initReactI18next).init({

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 
-const STORAGE_KEY = 'plex-collapsed-categories'
+const STORAGE_KEY = 'plyx-collapsed-categories'
 
 function load(): Record<string, boolean> {
   try {

@@ -1,10 +1,11 @@
 import { useMemo } from 'react'
-import { Wrench, Globe, Search, ChevronDown, Star, Command } from 'lucide-react'
+import { Wrench, Globe, Search, ChevronDown, Star, Command } from '../../icons'
 import { useTranslation } from 'react-i18next'
 import { NAV_CATEGORIES, HOME_ITEM } from '../../constants/navigation'
 import { LANGUAGES } from '../../i18n'
 import { NavItem } from './NavItem'
 import { ThemeSwitcher } from './ThemeSwitcher'
+import { AnalyticsToggle } from './AnalyticsToggle'
 import { useFavorites } from '../../hooks/useFavorites'
 import { useCollapsedCategories } from '../../hooks/useCollapsedCategories'
 import { useCommandPalette } from '../../hooks/useCommandPalette'
@@ -42,7 +43,7 @@ export function Sidebar() {
             <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
               <Wrench size={14} className="text-primary-content" />
             </div>
-            <span className="font-semibold text-base-content">Plex</span>
+            <span className="font-semibold text-base-content">Plyx</span>
           </div>
         </div>
 
@@ -120,6 +121,7 @@ export function Sidebar() {
             <span>{currentLang?.label}</span>
           </button>
         </div>
+        <AnalyticsToggle />
         <p className="text-xs text-base-content/40 px-2 flex items-center gap-1.5">
           <Command size={10} />
           {t('common.allToolsRunInBrowser')}

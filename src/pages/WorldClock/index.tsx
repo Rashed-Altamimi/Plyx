@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { X, Plus } from 'lucide-react'
+import { X, Plus } from '../../icons'
 import { formatInTimeZone } from 'date-fns-tz'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { Card } from '../../components/ui/Card'

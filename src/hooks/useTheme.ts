@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 
 export type ThemeId = string
 
-const STORAGE_KEY = 'plex-theme'
+const STORAGE_KEY = 'plyx-theme'
 
 export const THEMES = [
   { id: 'light',      label: 'Light',     emoji: '☀️' },

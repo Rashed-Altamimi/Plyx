@@ -61,8 +61,8 @@ import {
   Dice5,
   CircleQuestionMark,
   Smile,
-} from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
+} from '../icons'
+import type { LucideIcon } from '../icons'
 
 export interface NavItem {
   label: string

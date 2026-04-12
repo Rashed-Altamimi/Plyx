@@ -1,0 +1,107 @@
+/**
+ * Icon adapter — maps Lucide icon names to Phosphor equivalents.
+ *
+ * Phosphor has 9000+ icons (vs Lucide's ~1300), comes in 6 weights, and is MIT.
+ *
+ * We use per-icon subpath imports (`@phosphor-icons/react/dist/csr/<Name>`)
+ * instead of the package root so that tree-shaking is maximally effective —
+ * the bundler never has to look at the index file with all 9000 icons.
+ *
+ * Each Phosphor module exports its icon both as `Wrench` (named) and
+ * `WrenchIcon` (the suffix variant). We re-export the bare name with a
+ * Lucide-compatible alias so component imports stay unchanged.
+ */
+
+export type { Icon as LucideIcon } from '@phosphor-icons/react'
+
+// ---------- Direct name matches (Phosphor name === Lucide name) ----------
+export { Wrench }            from '@phosphor-icons/react/dist/csr/Wrench'
+export { Clock }             from '@phosphor-icons/react/dist/csr/Clock'
+export { Hash }              from '@phosphor-icons/react/dist/csr/Hash'
+export { Binary }            from '@phosphor-icons/react/dist/csr/Binary'
+export { Database }          from '@phosphor-icons/react/dist/csr/Database'
+export { Radio }             from '@phosphor-icons/react/dist/csr/Radio'
+export { Network }           from '@phosphor-icons/react/dist/csr/Network'
+export { Users }             from '@phosphor-icons/react/dist/csr/Users'
+export { Square }            from '@phosphor-icons/react/dist/csr/Square'
+export { Star }              from '@phosphor-icons/react/dist/csr/Star'
+export { Globe }             from '@phosphor-icons/react/dist/csr/Globe'
+export { Sigma }             from '@phosphor-icons/react/dist/csr/Sigma'
+export { Crop }              from '@phosphor-icons/react/dist/csr/Crop'
+export { Camera }            from '@phosphor-icons/react/dist/csr/Camera'
+export { Coins }             from '@phosphor-icons/react/dist/csr/Coins'
+export { Calculator }        from '@phosphor-icons/react/dist/csr/Calculator'
+export { Cake }              from '@phosphor-icons/react/dist/csr/Cake'
+export { Percent }           from '@phosphor-icons/react/dist/csr/Percent'
+export { Palette }           from '@phosphor-icons/react/dist/csr/Palette'
+export { Fingerprint }       from '@phosphor-icons/react/dist/csr/Fingerprint'
+export { Timer }             from '@phosphor-icons/react/dist/csr/Timer'
+export { Shuffle }           from '@phosphor-icons/react/dist/csr/Shuffle'
+export { Plus }              from '@phosphor-icons/react/dist/csr/Plus'
+export { Check }             from '@phosphor-icons/react/dist/csr/Check'
+export { Copy }              from '@phosphor-icons/react/dist/csr/Copy'
+export { Upload }            from '@phosphor-icons/react/dist/csr/Upload'
+export { Download }          from '@phosphor-icons/react/dist/csr/Download'
+export { Function }          from '@phosphor-icons/react/dist/csr/Function'
+export { ShieldCheck }       from '@phosphor-icons/react/dist/csr/ShieldCheck'
+export { Command }           from '@phosphor-icons/react/dist/csr/Command'
+export { Image }             from '@phosphor-icons/react/dist/csr/Image'
+export { X }                 from '@phosphor-icons/react/dist/csr/X'
+export { QrCode }            from '@phosphor-icons/react/dist/csr/QrCode'
+export { FileText }          from '@phosphor-icons/react/dist/csr/FileText'
+export { FileCode }          from '@phosphor-icons/react/dist/csr/FileCode'
+export { ArrowRight }        from '@phosphor-icons/react/dist/csr/ArrowRight'
+export { Ruler }             from '@phosphor-icons/react/dist/csr/Ruler'
+export { Thermometer }       from '@phosphor-icons/react/dist/csr/Thermometer'
+export { Gauge }             from '@phosphor-icons/react/dist/csr/Gauge'
+
+// ---------- Renamed: Lucide name → Phosphor source ----------
+export { Key as KeyRound }                       from '@phosphor-icons/react/dist/csr/Key'
+export { Calendar as CalendarDays }              from '@phosphor-icons/react/dist/csr/Calendar'
+export { TextAa as CaseSensitive }               from '@phosphor-icons/react/dist/csr/TextAa'
+export { Code as Braces }                        from '@phosphor-icons/react/dist/csr/Code'
+export { TextAlignLeft as AlignLeft }            from '@phosphor-icons/react/dist/csr/TextAlignLeft'
+export { GitDiff as GitCompare }                 from '@phosphor-icons/react/dist/csr/GitDiff'
+export { Asterisk as Regex }                     from '@phosphor-icons/react/dist/csr/Asterisk'
+export { LinkSimple as Link2 }                   from '@phosphor-icons/react/dist/csr/LinkSimple'
+export { TextT as Type }                         from '@phosphor-icons/react/dist/csr/TextT'
+export { DiceFive as Dices }                     from '@phosphor-icons/react/dist/csr/DiceFive'
+export { ArrowsOut as Scaling }                  from '@phosphor-icons/react/dist/csr/ArrowsOut'
+export { ArrowsIn as Minimize2 }                 from '@phosphor-icons/react/dist/csr/ArrowsIn'
+export { Eyedropper as Pipette }                 from '@phosphor-icons/react/dist/csr/Eyedropper'
+export { ArrowsLeftRight as ArrowLeftRight }     from '@phosphor-icons/react/dist/csr/ArrowsLeftRight'
+export { CurrencyDollar as DollarSign }          from '@phosphor-icons/react/dist/csr/CurrencyDollar'
+export { Path as Milestone }                     from '@phosphor-icons/react/dist/csr/Path'
+export { ArrowsDownUp as ArrowDownUp }           from '@phosphor-icons/react/dist/csr/ArrowsDownUp'
+export { Repeat as Replace }                     from '@phosphor-icons/react/dist/csr/Repeat'
+export { TreeStructure as ListTree }             from '@phosphor-icons/react/dist/csr/TreeStructure'
+export { FileText as FileType }                  from '@phosphor-icons/react/dist/csr/FileText'
+export { Cursor as MousePointer2 }               from '@phosphor-icons/react/dist/csr/Cursor'
+export { PaintBrush as Paintbrush }              from '@phosphor-icons/react/dist/csr/PaintBrush'
+export { Tag as Tags }                           from '@phosphor-icons/react/dist/csr/Tag'
+export { Money as Banknote }                     from '@phosphor-icons/react/dist/csr/Money'
+export { CalendarBlank as CalendarClock }        from '@phosphor-icons/react/dist/csr/CalendarBlank'
+export { Timer as TimerReset }                   from '@phosphor-icons/react/dist/csr/Timer'
+export { Function as SquareFunction }            from '@phosphor-icons/react/dist/csr/Function'
+export { ArrowClockwise as RotateCw }            from '@phosphor-icons/react/dist/csr/ArrowClockwise'
+export { ArrowCounterClockwise as RotateCcw }    from '@phosphor-icons/react/dist/csr/ArrowCounterClockwise'
+export { Image as ImageDown }                    from '@phosphor-icons/react/dist/csr/Image'
+export { ImageSquare as ImagePlus }              from '@phosphor-icons/react/dist/csr/ImageSquare'
+export { DiceFive as Dice5 }                     from '@phosphor-icons/react/dist/csr/DiceFive'
+export { Question as CircleQuestionMark }        from '@phosphor-icons/react/dist/csr/Question'
+export { Smiley as Smile }                       from '@phosphor-icons/react/dist/csr/Smiley'
+export { House as Home }                         from '@phosphor-icons/react/dist/csr/House'
+export { FilePlus as FileInput }                 from '@phosphor-icons/react/dist/csr/FilePlus'
+export { Scales as Weight }                      from '@phosphor-icons/react/dist/csr/Scales'
+export { Flask as FlaskConical }                 from '@phosphor-icons/react/dist/csr/Flask'
+
+// ---------- Component-only icons ----------
+export { Pulse as Activity }                     from '@phosphor-icons/react/dist/csr/Pulse'
+export { Warning as AlertTriangle }              from '@phosphor-icons/react/dist/csr/Warning'
+export { CaretDown as ChevronDown }              from '@phosphor-icons/react/dist/csr/CaretDown'
+export { ArrowClockwise as RefreshCw }           from '@phosphor-icons/react/dist/csr/ArrowClockwise'
+export { MagnifyingGlass as Search }             from '@phosphor-icons/react/dist/csr/MagnifyingGlass'
+export { List as Menu }                          from '@phosphor-icons/react/dist/csr/List'
+export { Trash as Trash2 }                       from '@phosphor-icons/react/dist/csr/Trash'
+export { FlipHorizontal as FlipHorizontal2 }     from '@phosphor-icons/react/dist/csr/FlipHorizontal'
+export { FlipVertical as FlipVertical2 }         from '@phosphor-icons/react/dist/csr/FlipVertical'

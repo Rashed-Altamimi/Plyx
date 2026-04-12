@@ -10,7 +10,7 @@ import { CopyButton } from '../../components/ui/CopyButton'
 
 const DEFAULT_JSON = `{
   "id": 1,
-  "name": "Plex",
+  "name": "Plyx",
   "active": true,
   "tags": ["tool", "utility"],
   "owner": {
