@@ -48,10 +48,10 @@ export function FindReplace() {
       <p className="text-sm text-base-content/50 mb-8">{t('findReplace.subtitle')}</p>
 
       <Card className="space-y-3 mb-4">
-        <Textarea label={t('findReplace.input')} value={input} onChange={(e) => setInput(e.target.value)} rows={6} className="font-mono text-xs" />
+        <Textarea label={t('findReplace.input')} value={input} onChange={(e) => setInput(e.target.value)} rows={6} className="font-mono mono-prose text-xs" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <Input label={t('findReplace.find')} value={find} onChange={(e) => setFind(e.target.value)} className="font-mono" />
-          <Input label={t('findReplace.replaceWith')} value={replaceWith} onChange={(e) => setReplaceWith(e.target.value)} className="font-mono" />
+          <Input label={t('findReplace.find')} value={find} onChange={(e) => setFind(e.target.value)} className="font-mono mono-prose" />
+          <Input label={t('findReplace.replaceWith')} value={replaceWith} onChange={(e) => setReplaceWith(e.target.value)} className="font-mono mono-prose" />
         </div>
         <div className="flex flex-wrap gap-4">
           <Checkbox label={t('findReplace.useRegex')} checked={useRegex} onChange={(e) => setUseRegex(e.target.checked)} />
@@ -72,7 +72,7 @@ export function FindReplace() {
             <label className="text-sm font-medium text-base-content/70">{t('findReplace.output')}</label>
             {output && <CopyButton text={output} />}
           </div>
-          <Textarea value={output} readOnly rows={6} className="font-mono text-xs" />
+          <Textarea value={output} readOnly rows={6} className="font-mono mono-prose text-xs" />
         </Card>
       )}
     </div>

@@ -47,7 +47,7 @@ export function TextDiff() {
             <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-700">{t('diff.added', { count: stats.added })}</span>
             <span className="text-xs px-2 py-0.5 rounded-full bg-red-50 text-red-700">{t('diff.removed', { count: stats.removed })}</span>
           </div>
-          <div className="font-mono text-sm leading-7 whitespace-pre-wrap break-all bg-base-200 rounded-lg p-4">
+          <div className="font-mono mono-prose text-sm leading-7 whitespace-pre-wrap break-all bg-base-200 rounded-lg p-4">
             {diffs.map((part, i) => (
               <span
                 key={i}

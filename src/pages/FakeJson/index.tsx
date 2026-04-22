@@ -85,7 +85,7 @@ export function FakeJson() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-10">
+    <div className="max-w-6xl 3xl:max-w-7xl 4xl:max-w-[1760px] 5xl:max-w-[2400px] mx-auto px-6 py-10">
       <h1 className="text-2xl font-semibold text-base-content mb-1">{t('fakeJson.title')}</h1>
       <p className="text-sm text-base-content/50 mb-6">{t('fakeJson.subtitle')}</p>
 

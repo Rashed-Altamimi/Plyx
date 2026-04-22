@@ -106,7 +106,7 @@ export function CommandPalette({ open, onClose }: Props) {
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] px-4 bg-black/50"
+          className="fixed inset-0 z-50 flex items-start justify-center pt-[12vh] px-4 bg-black/70 backdrop-blur-sm"
           onClick={onClose}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -117,15 +117,18 @@ export function CommandPalette({ open, onClose }: Props) {
             role="dialog"
             aria-modal="true"
             aria-label={t('palette.searchPlaceholder')}
-            className="w-full max-w-xl bg-base-100 rounded-2xl shadow-2xl border border-base-200 overflow-hidden"
+            className="relative w-full max-w-xl bg-base-100/95 backdrop-blur-xl rounded-2xl border border-base-content/10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5),0_0_0_1px_var(--primary-08)] overflow-hidden"
             onClick={(e) => e.stopPropagation()}
             initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: -8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.98, y: -4 }}
             transition={{ type: 'spring', stiffness: 420, damping: 32, mass: 0.9 }}
           >
+            {/* subtle accent glow on top edge */}
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+
         {/* Search input */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-base-200">
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-base-content/[0.06]">
           <Search size={18} className="text-base-content/40 shrink-0" />
           <input
             ref={inputRef}
@@ -133,14 +136,14 @@ export function CommandPalette({ open, onClose }: Props) {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={onKeyDown}
             placeholder={t('palette.searchPlaceholder')}
-            className="flex-1 bg-transparent text-base text-base-content placeholder-base-content/40 outline-none"
+            className="flex-1 bg-transparent text-base text-base-content placeholder-base-content/35 outline-none"
           />
-          <kbd className="hidden sm:inline-block text-xs font-mono text-base-content/40 bg-base-200 px-2 py-0.5 rounded border border-base-300">
+          <kbd className="kbd-hint hidden sm:inline-flex">
             ESC
           </kbd>
           <button
             onClick={onClose}
-            className="sm:hidden p-1 rounded hover:bg-base-200 text-base-content/60"
+            className="sm:hidden p-1 rounded hover:bg-base-content/5 text-base-content/60"
             aria-label="Close"
           >
             <X size={16} />
@@ -150,16 +153,16 @@ export function CommandPalette({ open, onClose }: Props) {
         {/* Results */}
         <div ref={listRef} className="max-h-[60vh] overflow-y-auto py-2">
           {flatItems.length === 0 ? (
-            <p className="text-sm text-base-content/40 text-center py-8">{t('palette.noResults')}</p>
+            <p className="text-sm text-base-content/40 text-center py-10">{t('palette.noResults')}</p>
           ) : (
             sections.map((section) => {
               if (section.items.length === 0) return null
               const SectionIcon = section.icon
               return (
-                <div key={section.key} className="mb-2">
-                  <div className="flex items-center gap-2 px-4 py-1.5">
-                    <SectionIcon size={11} className="text-base-content/40" />
-                    <p className="text-xs font-semibold text-base-content/40 uppercase tracking-wider">
+                <div key={section.key} className="mb-1">
+                  <div className="flex items-center gap-2 px-5 py-1.5">
+                    <SectionIcon size={10} className="text-base-content/40" />
+                    <p className="eyebrow">
                       {section.label}
                     </p>
                   </div>
@@ -174,22 +177,27 @@ export function CommandPalette({ open, onClose }: Props) {
                         data-index={idx}
                         onClick={() => runItem(item)}
                         onMouseEnter={() => setActive(idx)}
-                        className={`w-full flex items-center gap-3 px-5 py-2.5 text-left cursor-pointer transition-colors ${
-                          isActive ? 'bg-primary/15' : 'hover:bg-base-200'
+                        className={`relative w-full flex items-center gap-3 px-5 py-2 text-left cursor-pointer transition-colors ${
+                          isActive ? 'bg-primary/15' : 'hover:bg-base-content/[0.04]'
                         }`}
                       >
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                          isActive ? 'bg-primary text-primary-content' : 'bg-base-200 text-base-content/60'
+                        {isActive && (
+                          <span className="absolute start-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full bg-primary shadow-[0_0_8px_var(--primary-70)]" />
+                        )}
+                        <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 transition-colors ${
+                          isActive
+                            ? 'bg-primary/20 text-primary'
+                            : 'bg-base-content/5 text-base-content/60'
                         }`}>
-                          <Icon size={15} />
+                          <Icon size={13} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className={`text-sm font-medium truncate ${isActive ? 'text-primary' : 'text-base-content'}`}>
+                          <p className={`text-sm font-medium truncate ${isActive ? 'text-base-content' : 'text-base-content/80'}`}>
                             {item.label}
                           </p>
-                          <p className="text-xs text-base-content/50 truncate">{item.description}</p>
+                          <p className="text-xs text-base-content/45 truncate">{item.description}</p>
                         </div>
-                        <span className="text-xs text-base-content/40 shrink-0 hidden sm:inline">{item.category}</span>
+                        <span className="text-[10px] font-mono text-base-content/35 shrink-0 hidden sm:inline uppercase tracking-wider">{item.category}</span>
                       </button>
                     )
                   })}
@@ -200,17 +208,17 @@ export function CommandPalette({ open, onClose }: Props) {
         </div>
 
         {/* Footer with shortcut hints */}
-        <div className="flex items-center gap-4 px-5 py-2.5 border-t border-base-200 bg-base-200/50 text-xs text-base-content/50">
+        <div className="flex items-center gap-4 px-5 py-2.5 border-t border-base-content/[0.06] bg-base-content/[0.02] text-[11px] text-base-content/50">
           <span className="flex items-center gap-1.5">
-            <kbd className="font-mono bg-base-100 px-1.5 py-0.5 rounded border border-base-300">↑↓</kbd>
+            <kbd className="kbd-hint">↑↓</kbd>
             {t('palette.navigate')}
           </span>
           <span className="flex items-center gap-1.5">
-            <kbd className="font-mono bg-base-100 px-1.5 py-0.5 rounded border border-base-300">↵</kbd>
+            <kbd className="kbd-hint">↵</kbd>
             {t('palette.open')}
           </span>
           <span className="flex items-center gap-1.5 ms-auto">
-            <kbd className="font-mono bg-base-100 px-1.5 py-0.5 rounded border border-base-300">{flatItems.length}</kbd>
+            <kbd className="kbd-hint tabular-nums">{flatItems.length}</kbd>
             {t('palette.tools')}
           </span>
         </div>

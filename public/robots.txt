@@ -1,0 +1,7 @@
+# Plyx — https://rashed-altamimi.github.io/Plyx
+# All tools run in the browser. Crawl freely.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://rashed-altamimi.github.io/Plyx/sitemap.xml

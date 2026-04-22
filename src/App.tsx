@@ -5,6 +5,7 @@ import { AppShell } from './components/layout/AppShell'
 import { ErrorBoundary } from './components/layout/ErrorBoundary'
 import { PageSkeleton } from './components/layout/PageSkeleton'
 import { PageTransition } from './components/layout/PageTransition'
+import { TooltipProvider } from './components/ui/Tooltip'
 import { Home } from './pages/Home'
 
 // Converters
@@ -48,6 +49,13 @@ const SubnetCalculator = lazy(() => import('./pages/SubnetCalculator').then(m =>
 const JsonToTs         = lazy(() => import('./pages/JsonToTs').then(m => ({ default: m.JsonToTs })))
 const QrScanner        = lazy(() => import('./pages/QrScanner').then(m => ({ default: m.QrScanner })))
 const FakeJson         = lazy(() => import('./pages/FakeJson').then(m => ({ default: m.FakeJson })))
+const ColorPalette     = lazy(() => import('./pages/ColorPalette').then(m => ({ default: m.ColorPalette })))
+const ContrastChecker  = lazy(() => import('./pages/ContrastChecker').then(m => ({ default: m.ContrastChecker })))
+const AesCipher        = lazy(() => import('./pages/AesCipher').then(m => ({ default: m.AesCipher })))
+const JsonSchema       = lazy(() => import('./pages/JsonSchema').then(m => ({ default: m.JsonSchema })))
+const Ocr              = lazy(() => import('./pages/Ocr').then(m => ({ default: m.Ocr })))
+const BackgroundRemover = lazy(() => import('./pages/BackgroundRemover').then(m => ({ default: m.BackgroundRemover })))
+const AudioInspector   = lazy(() => import('./pages/AudioInspector').then(m => ({ default: m.AudioInspector })))
 
 // Generators
 const UuidGenerator      = lazy(() => import('./pages/UuidGenerator').then(m => ({ default: m.UuidGenerator })))
@@ -69,6 +77,8 @@ const DateDiff             = lazy(() => import('./pages/DateDiff').then(m => ({ 
 const TimeDuration         = lazy(() => import('./pages/TimeDuration').then(m => ({ default: m.TimeDuration })))
 const ScientificCalculator = lazy(() => import('./pages/ScientificCalculator').then(m => ({ default: m.ScientificCalculator })))
 const PrimeChecker         = lazy(() => import('./pages/PrimeChecker').then(m => ({ default: m.PrimeChecker })))
+const CompoundInterest     = lazy(() => import('./pages/CompoundInterest').then(m => ({ default: m.CompoundInterest })))
+const Mortgage             = lazy(() => import('./pages/Mortgage').then(m => ({ default: m.Mortgage })))
 
 // Image Tools
 const ImageResizer    = lazy(() => import('./pages/ImageResizer').then(m => ({ default: m.ImageResizer })))
@@ -137,6 +147,13 @@ function RoutesShell() {
             <Route path="/json-ts"       element={<JsonToTs />} />
             <Route path="/qr-scan"       element={<QrScanner />} />
             <Route path="/fake-json"     element={<FakeJson />} />
+            <Route path="/palette"       element={<ColorPalette />} />
+            <Route path="/contrast"      element={<ContrastChecker />} />
+            <Route path="/aes"           element={<AesCipher />} />
+            <Route path="/json-schema"   element={<JsonSchema />} />
+            <Route path="/ocr"           element={<Ocr />} />
+            <Route path="/bg-remove"     element={<BackgroundRemover />} />
+            <Route path="/audio"         element={<AudioInspector />} />
 
             {/* Generators */}
             <Route path="/uuid"       element={<UuidGenerator />} />
@@ -158,6 +175,8 @@ function RoutesShell() {
             <Route path="/duration"   element={<TimeDuration />} />
             <Route path="/scientific" element={<ScientificCalculator />} />
             <Route path="/prime"      element={<PrimeChecker />} />
+            <Route path="/compound"   element={<CompoundInterest />} />
+            <Route path="/mortgage"   element={<Mortgage />} />
 
             {/* Image Tools */}
             <Route path="/resize"      element={<ImageResizer />} />
@@ -191,10 +210,12 @@ const basename = import.meta.env.BASE_URL.replace(/\/$/, '')
 
 export default function App() {
   return (
-    <BrowserRouter basename={basename}>
-      <AppShell>
-        <RoutesShell />
-      </AppShell>
-    </BrowserRouter>
+    <TooltipProvider delayDuration={250} skipDelayDuration={400}>
+      <BrowserRouter basename={basename}>
+        <AppShell>
+          <RoutesShell />
+        </AppShell>
+      </BrowserRouter>
+    </TooltipProvider>
   )
 }

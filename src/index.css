@@ -1,30 +1,291 @@
 @import "tailwindcss";
+
+/* -------------------------------------------------------------------------
+ * Plyx design system — Raycast/Linear-inspired dark-first console aesthetic.
+ * Adds two custom themes ("plyxDark" default, "plyxLight") plus the existing
+ * DaisyUI themes for users who want to switch.
+ * -------------------------------------------------------------------------
+ */
+
 @plugin "daisyui" {
-  themes: light, dark, cupcake, corporate, emerald, synthwave, dracula, nord, sunset, retro;
+  themes:
+    light,
+    dark,
+    cupcake,
+    corporate,
+    emerald,
+    synthwave,
+    dracula,
+    nord,
+    sunset,
+    retro;
+}
+
+@plugin "daisyui/theme" {
+  name: "plyxDark";
+  default: true;
+  prefersdark: true;
+  color-scheme: dark;
+
+  --color-base-100: oklch(15% 0.006 285);
+  --color-base-200: oklch(18% 0.006 285);
+  --color-base-300: oklch(23% 0.007 285);
+  --color-base-content: oklch(96% 0.003 285);
+
+  --color-primary: oklch(65% 0.22 285);
+  --color-primary-content: oklch(98% 0 0);
+
+  --color-secondary: oklch(70% 0.18 310);
+  --color-secondary-content: oklch(98% 0 0);
+
+  --color-accent: oklch(74% 0.16 200);
+  --color-accent-content: oklch(20% 0 0);
+
+  --color-neutral: oklch(20% 0.006 285);
+  --color-neutral-content: oklch(90% 0.003 285);
+
+  --color-info: oklch(70% 0.18 225);
+  --color-info-content: oklch(15% 0 0);
+  --color-success: oklch(72% 0.19 145);
+  --color-success-content: oklch(15% 0 0);
+  --color-warning: oklch(80% 0.18 75);
+  --color-warning-content: oklch(15% 0 0);
+  --color-error: oklch(66% 0.22 25);
+  --color-error-content: oklch(98% 0 0);
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.75rem;
+
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  --border: 1px;
+}
+
+@plugin "daisyui/theme" {
+  name: "plyxLight";
+  color-scheme: light;
+
+  --color-base-100: oklch(99% 0.002 285);
+  --color-base-200: oklch(96% 0.003 285);
+  --color-base-300: oklch(92% 0.004 285);
+  --color-base-content: oklch(20% 0.006 285);
+
+  --color-primary: oklch(58% 0.22 285);
+  --color-primary-content: oklch(99% 0 0);
+
+  --color-secondary: oklch(60% 0.2 310);
+  --color-secondary-content: oklch(99% 0 0);
+
+  --color-accent: oklch(65% 0.18 200);
+  --color-accent-content: oklch(98% 0 0);
+
+  --color-neutral: oklch(22% 0.006 285);
+  --color-neutral-content: oklch(95% 0.003 285);
+
+  --color-info: oklch(60% 0.18 225);
+  --color-success: oklch(60% 0.19 145);
+  --color-warning: oklch(72% 0.18 75);
+  --color-error: oklch(58% 0.22 25);
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.75rem;
+}
+
+@theme {
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Extra breakpoints for wide monitors. */
+  --breakpoint-3xl: 1920px;
+  --breakpoint-4xl: 2560px;
+  --breakpoint-5xl: 3840px;
 }
 
 @layer base {
+  /* -----------------------------------------------------------------------
+   * Pre-computed tinted colors — DaisyUI stores --color-* as the full
+   * `oklch(...)` call, so `oklch(var(--color-primary) / 0.4)` is invalid.
+   * We derive transparent variants via color-mix (per-theme reactive).
+   * ----------------------------------------------------------------------- */
+  :root {
+    --primary-40:  color-mix(in oklab, var(--color-primary) 40%, transparent);
+    --primary-35:  color-mix(in oklab, var(--color-primary) 35%, transparent);
+    --primary-50:  color-mix(in oklab, var(--color-primary) 50%, transparent);
+    --primary-70:  color-mix(in oklab, var(--color-primary) 70%, transparent);
+    --primary-08:  color-mix(in oklab, var(--color-primary) 8%,  transparent);
+    --secondary-55: color-mix(in oklab, var(--color-secondary) 55%, transparent);
+    --ink-6:  color-mix(in oklab, var(--color-base-content) 6%,  transparent);
+    --ink-8:  color-mix(in oklab, var(--color-base-content) 8%,  transparent);
+    --ink-10: color-mix(in oklab, var(--color-base-content) 10%, transparent);
+    --ink-20: color-mix(in oklab, var(--color-base-content) 20%, transparent);
+    --ink-50: color-mix(in oklab, var(--color-base-content) 50%, transparent);
+    --ink-60: color-mix(in oklab, var(--color-base-content) 60%, transparent);
+  }
+
   * {
     box-sizing: border-box;
   }
 
+  html {
+    font-feature-settings: 'ss01', 'ss02', 'cv01', 'cv02', 'cv11';
+  }
+
   body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    letter-spacing: -0.003em;
   }
 
   [dir="rtl"] body {
     font-family: 'Segoe UI', Tahoma, 'Noto Sans Arabic', 'Noto Kufi Arabic', system-ui, sans-serif;
   }
 
+  code, pre, kbd, samp {
+    font-family: var(--font-mono);
+  }
+
+  /* Keep code / data outputs LTR even when the UI is in Arabic mode.
+   * JSON, YAML, SQL, Base64, hashes, etc. should never flow right-to-left.
+   * Narrow heuristic: font-mono is the flag — if you use it, you're showing
+   * code/data. Targets textarea, input, pre, code and anything else carrying
+   * the class. */
+  [dir="rtl"] .font-mono,
+  [dir="rtl"] pre,
+  [dir="rtl"] code {
+    direction: ltr;
+    text-align: left;
+  }
+  /* Opt-out for mono-styled fields that hold natural-language text (line
+   * sorting, find/replace, markdown, diffs). Add `.mono-prose` to keep the
+   * monospace font while letting direction follow the surrounding locale. */
+  [dir="rtl"] .mono-prose {
+    direction: rtl;
+    text-align: start;
+  }
+  /* kbd-hint chips should stay LTR (numeric/symbol shortcuts) */
+  [dir="rtl"] .kbd-hint {
+    direction: ltr;
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+
+  .eyebrow {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-50);
+  }
+
+  .kbd-hint {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: color-mix(in oklab, var(--color-base-300) 60%, transparent);
+    border: 1px solid var(--ink-8);
+    color: var(--ink-60);
+  }
+
   .sidebar-border {
-    border-right: 1px solid oklch(var(--b3));
+    border-right: 1px solid var(--ink-6);
     border-left: none;
   }
   [dir="rtl"] .sidebar-border {
     border-right: none;
-    border-left: 1px solid oklch(var(--b3));
+    border-left: 1px solid var(--ink-6);
   }
 
+  .bg-dot-grid {
+    background-image: radial-gradient(var(--ink-6) 1px, transparent 1px);
+    background-size: 22px 22px;
+    background-position: 0 0;
+  }
+
+  .bg-scan {
+    background-image: linear-gradient(
+      color-mix(in oklab, var(--color-base-content) 2.5%, transparent) 1px,
+      transparent 1px
+    );
+    background-size: 100% 3px;
+  }
+
+  .glow-primary {
+    box-shadow:
+      0 0 0 1px var(--primary-35),
+      0 10px 40px -10px var(--primary-35);
+  }
+
+  .glow-primary-soft {
+    box-shadow: 0 0 24px -4px var(--primary-35);
+  }
+
+  .hero-orb {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+  .hero-orb::before,
+  .hero-orb::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(110px);
+    opacity: 0.32;
+  }
+  .hero-orb::before {
+    top: -220px;
+    left: -80px;
+    width: 520px;
+    height: 520px;
+    background: radial-gradient(circle at 30% 30%, var(--primary-70), transparent 60%);
+  }
+  .hero-orb::after {
+    top: -160px;
+    right: -100px;
+    width: 460px;
+    height: 460px;
+    background: radial-gradient(circle at 70% 30%, var(--secondary-55), transparent 60%);
+  }
+
+  /* Selection — visible on every theme */
+  ::selection {
+    background-color: var(--primary-40);
+    color: var(--color-base-content);
+  }
+  ::-moz-selection {
+    background-color: var(--primary-40);
+    color: var(--color-base-content);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--ink-10);
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--ink-20);
+    background-clip: padding-box;
+  }
 }

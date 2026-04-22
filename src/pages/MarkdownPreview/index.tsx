@@ -63,7 +63,7 @@ export function MarkdownPreview() {
               <span className="text-xs text-base-content/40 font-medium">{t('markdown.markdownLabel')}</span>
             </div>
             <textarea
-              className="flex-1 p-4 font-mono text-sm text-base-content resize-none outline-none bg-base-100"
+              className="flex-1 p-4 font-mono mono-prose text-sm text-base-content resize-none outline-none bg-base-100"
               value={text}
               onChange={(e) => setText(e.target.value)}
               spellCheck={false}

@@ -1,12 +1,10 @@
 import { useState, useMemo } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { Menu, X, Wrench, Globe, Search, ChevronDown, Star } from '../../icons'
+import { Menu, X, Wrench, Search, ChevronDown, Star } from '../../icons'
 import { useTranslation } from 'react-i18next'
 import { HOME_ITEM, NAV_CATEGORIES } from '../../constants/navigation'
-import { LANGUAGES } from '../../i18n'
 import { NavItem } from './NavItem'
-import { ThemeSwitcher } from './ThemeSwitcher'
-import { AnalyticsToggle } from './AnalyticsToggle'
+import { Settings } from './Settings'
 import { useFavorites } from '../../hooks/useFavorites'
 import { useCollapsedCategories } from '../../hooks/useCollapsedCategories'
 import { useCommandPalette } from '../../hooks/useCommandPalette'
@@ -19,14 +17,6 @@ export function MobileHeader() {
   const { openPalette } = useCommandPalette()
   const reduce = useReducedMotion()
   const isRtl = i18n.dir() === 'rtl'
-
-  const switchLang = () => {
-    const currentIdx = LANGUAGES.findIndex((l) => l.code === i18n.language)
-    const next = LANGUAGES[(currentIdx + 1) % LANGUAGES.length]
-    i18n.changeLanguage(next.code)
-  }
-
-  const currentLang = LANGUAGES.find((l) => l.code === i18n.language)
 
   const favNavItems = useMemo(() => {
     const all = NAV_CATEGORIES.flatMap((c) => c.items)
@@ -43,10 +33,10 @@ export function MobileHeader() {
     <>
       <header className="md:hidden sticky top-0 z-40 flex items-center justify-between px-4 py-3 bg-base-100 border-b border-base-200">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-sm">
             <Wrench size={14} className="text-primary-content" />
           </div>
-          <span className="font-semibold text-base-content">Plyx</span>
+          <span className="font-display font-bold text-lg text-base-content tracking-tight">Plyx</span>
         </div>
         <div className="flex items-center gap-1">
           <button
@@ -162,18 +152,11 @@ export function MobileHeader() {
           })}
         </nav>
 
-        <div className="px-4 py-3 border-t border-base-200 shrink-0 space-y-3">
-          <div className="flex items-center justify-between px-2">
-            <ThemeSwitcher />
-            <button
-              onClick={switchLang}
-              className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs text-base-content/60 hover:bg-base-200 hover:text-base-content transition-colors cursor-pointer"
-            >
-              <Globe size={12} />
-              <span>{currentLang?.label}</span>
-            </button>
-          </div>
-          <AnalyticsToggle />
+        <div className="px-4 py-3 border-t border-base-200 shrink-0 flex items-center justify-between">
+          <p className="text-[10px] text-base-content/40 tracking-wide">
+            {t('common.allToolsRunInBrowser')}
+          </p>
+          <Settings align="end" />
         </div>
       </motion.div>
     </>

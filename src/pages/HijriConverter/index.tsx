@@ -9,8 +9,6 @@ import {
   gregorianToHijri,
   hijriToGregorian,
   getHijriDaysInMonth,
-  formatHijriDate,
-  formatGregorianDate,
   todayGregorian,
   todayHijri,
   HIJRI_MONTHS,
@@ -24,6 +22,20 @@ export function HijriConverter() {
   const { t } = useTranslation()
   useDocumentTitle(t('hijri.title'))
   const [tab, setTab] = useState('g2h')
+
+  const formatHijri = (hy: number, hm: number, hd: number) =>
+    t('hijri.hijriFormat', {
+      day: hd,
+      month: t(`hijriMonths.${hm}`),
+      year: hy,
+    })
+
+  const formatGregorian = (gy: number, gm: number, gd: number) =>
+    t('hijri.gregorianFormat', {
+      day: gd,
+      month: t(`gregorianMonths.${gm}`),
+      year: gy,
+    })
 
   const TABS = [
     { id: 'g2h', label: t('hijri.g2h') },
@@ -50,7 +62,7 @@ export function HijriConverter() {
   const convertToHijri = () => {
     try {
       const result = gregorianToHijri(gy, gm, gd)
-      setHijriResult(formatHijriDate(result.hy, result.hm, result.hd))
+      setHijriResult(formatHijri(result.hy, result.hm, result.hd))
       setGError('')
     } catch {
       setGError(t('hijri.conversionError'))
@@ -67,13 +79,14 @@ export function HijriConverter() {
         return
       }
       const result = hijriToGregorian(hy, hm, hd)
-      setGregResult(formatGregorianDate(result.gy, result.gm, result.gd))
+      setGregResult(formatGregorian(result.gy, result.gm, result.gd))
       setHError('')
     } catch {
       setHError(t('hijri.conversionError'))
       setGregResult(null)
     }
   }
+
 
   const gDaysInMonth = new Date(gy, gm, 0).getDate()
   const hDaysInMonth = getHijriDaysInMonth(hy, hm)

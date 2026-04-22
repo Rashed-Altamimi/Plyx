@@ -59,7 +59,7 @@ export function SortLines() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="space-y-3">
           <label className="text-sm font-medium text-base-content/70">{t('sortLines.input')}</label>
-          <Textarea value={input} onChange={(e) => setInput(e.target.value)} rows={12} className="font-mono text-xs" />
+          <Textarea value={input} onChange={(e) => setInput(e.target.value)} rows={12} className="font-mono mono-prose text-xs" />
         </Card>
 
         <Card className="space-y-3">
@@ -70,7 +70,7 @@ export function SortLines() {
               {output && <CopyButton text={output} />}
             </div>
           </div>
-          <Textarea value={output} readOnly rows={12} className="font-mono text-xs" />
+          <Textarea value={output} readOnly rows={12} className="font-mono mono-prose text-xs" />
         </Card>
       </div>
 

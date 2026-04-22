@@ -39,6 +39,8 @@ export function getHijriDaysInMonth(hy: number, hm: number): number {
   return 29
 }
 
+// English fallback formatters, kept for non-React callers. UI components format
+// via i18n (see HijriConverter).
 export function formatHijriDate(hy: number, hm: number, hd: number): string {
   const monthName = HIJRI_MONTHS[hm - 1] ?? ''
   return `${hd} ${monthName} ${hy} AH`

@@ -4,6 +4,7 @@ import { MobileHeader } from './MobileHeader'
 import { CommandPalette } from './CommandPalette'
 import { RouteTracker } from './RouteTracker'
 import { AnalyticsTracker } from './AnalyticsTracker'
+import { SeoHead } from './SeoHead'
 import { useDirection } from '../../hooks/useDirection'
 import { useCommandPalette } from '../../hooks/useCommandPalette'
 
@@ -16,7 +17,8 @@ export function AppShell({ children }: AppShellProps) {
   const { open, closePalette } = useCommandPalette()
 
   return (
-    <div className="flex min-h-screen bg-base-200">
+    <div className="flex min-h-screen bg-base-100">
+      <SeoHead />
       <RouteTracker />
       <AnalyticsTracker />
       <CommandPalette open={open} onClose={closePalette} />

@@ -3,23 +3,26 @@ import { useState, useEffect, useCallback } from 'react'
 export type ThemeId = string
 
 const STORAGE_KEY = 'plyx-theme'
+const DEFAULT_THEME: ThemeId = 'plyxDark'
 
 export const THEMES = [
-  { id: 'light',      label: 'Light',     emoji: '☀️' },
-  { id: 'dark',       label: 'Dark',      emoji: '🌙' },
-  { id: 'cupcake',    label: 'Cupcake',   emoji: '🧁' },
-  { id: 'corporate',  label: 'Corporate', emoji: '🏢' },
-  { id: 'emerald',    label: 'Emerald',   emoji: '✳️' },
-  { id: 'synthwave',  label: 'Synthwave', emoji: '🌆' },
-  { id: 'dracula',    label: 'Dracula',   emoji: '🧛' },
-  { id: 'nord',       label: 'Nord',      emoji: '❄️' },
-  { id: 'sunset',     label: 'Sunset',    emoji: '🌅' },
-  { id: 'retro',      label: 'Retro',     emoji: '📺' },
+  { id: 'plyxDark',   label: 'Plyx Dark',  emoji: '●' },
+  { id: 'plyxLight',  label: 'Plyx Light', emoji: '○' },
+  { id: 'light',      label: 'Light',      emoji: '☀️' },
+  { id: 'dark',       label: 'Dark',       emoji: '🌙' },
+  { id: 'cupcake',    label: 'Cupcake',    emoji: '🧁' },
+  { id: 'corporate',  label: 'Corporate',  emoji: '🏢' },
+  { id: 'emerald',    label: 'Emerald',    emoji: '✳️' },
+  { id: 'synthwave',  label: 'Synthwave',  emoji: '🌆' },
+  { id: 'dracula',    label: 'Dracula',    emoji: '🧛' },
+  { id: 'nord',       label: 'Nord',       emoji: '❄️' },
+  { id: 'sunset',     label: 'Sunset',     emoji: '🌅' },
+  { id: 'retro',      label: 'Retro',      emoji: '📺' },
 ] as const
 
 function getSavedTheme(): ThemeId {
-  if (typeof localStorage === 'undefined') return 'light'
-  return localStorage.getItem(STORAGE_KEY) || 'light'
+  if (typeof localStorage === 'undefined') return DEFAULT_THEME
+  return localStorage.getItem(STORAGE_KEY) || DEFAULT_THEME
 }
 
 function applyTheme(theme: ThemeId) {
