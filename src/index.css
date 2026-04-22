@@ -27,22 +27,4 @@
     border-left: 1px solid oklch(var(--b3));
   }
 
-  [dir="rtl"] .mobile-drawer {
-    left: auto;
-    right: 0;
-    transform: translateX(100%);
-  }
-  [dir="rtl"] .mobile-drawer.open {
-    transform: translateX(0);
-  }
-  [dir="ltr"] .mobile-drawer,
-  :not([dir="rtl"]) .mobile-drawer {
-    left: 0;
-    right: auto;
-    transform: translateX(-100%);
-  }
-  [dir="ltr"] .mobile-drawer.open,
-  :not([dir="rtl"]) .mobile-drawer.open {
-    transform: translateX(0);
-  }
 }

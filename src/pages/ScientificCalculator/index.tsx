@@ -38,7 +38,7 @@ export function ScientificCalculator() {
   const [expr, setExpr] = useState('')
   const [result, setResult] = useState<string>('')
   const [mode, setMode] = useState<Mode>('deg')
-  const [history, setHistory] = useState<{ expr: string; result: string }[]>([])
+  const [history, setHistory] = useState<{ id: number; expr: string; result: string }[]>([])
   const [error, setError] = useState(false)
 
   const handleInput = (value: string) => {
@@ -57,7 +57,7 @@ export function ScientificCalculator() {
         const r = evaluate(expr, mode)
         const rStr = Number(r.toFixed(12)).toString()
         setResult(rStr)
-        setHistory((h) => [{ expr, result: rStr }, ...h].slice(0, 10))
+        setHistory((h) => [{ id: Date.now() + Math.random(), expr, result: rStr }, ...h].slice(0, 10))
       } catch {
         setError(true)
         setResult(t('scientific.error'))
@@ -124,9 +124,9 @@ export function ScientificCalculator() {
         <Card>
           <p className="text-xs font-semibold text-base-content/40 uppercase tracking-wider mb-2">{t('scientific.history')}</p>
           <div className="space-y-1 max-h-40 overflow-y-auto">
-            {history.map((h, i) => (
+            {history.map((h) => (
               <button
-                key={i}
+                key={h.id}
                 onClick={() => { setExpr(h.expr); setResult(h.result); setError(false) }}
                 className="w-full text-left text-xs font-mono text-base-content/60 hover:bg-base-200 rounded px-2 py-1 cursor-pointer"
               >

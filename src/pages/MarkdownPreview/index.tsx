@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
+import { useDebounced } from '../../hooks/useDebounced'
 import { Tabs } from '../../components/ui/Tabs'
 
 const DEFAULT_MD = `# Hello, Markdown!
@@ -38,6 +39,7 @@ export function MarkdownPreview() {
   useDocumentTitle(t('markdown.title'))
   const [text, setText] = useState(DEFAULT_MD)
   const [view, setView] = useState('split')
+  const debouncedText = useDebounced(text, 120)
 
   const TABS = [
     { id: 'split',   label: t('markdown.split') },
@@ -75,7 +77,7 @@ export function MarkdownPreview() {
               <span className="text-xs text-base-content/40 font-medium">{t('markdown.previewLabel')}</span>
             </div>
             <div className="p-6 prose prose-sm max-w-none prose-neutral">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{debouncedText}</ReactMarkdown>
             </div>
           </div>
         )}

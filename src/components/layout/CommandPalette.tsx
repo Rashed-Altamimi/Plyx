@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Search, Star, Clock, ArrowRight, X } from '../../icons'
 import { buildToolIndex, filterAndRank, type ToolEntry } from '../../utils/toolSearch'
 import { useFavorites } from '../../hooks/useFavorites'
@@ -16,10 +17,12 @@ export function CommandPalette({ open, onClose }: Props) {
   const navigate = useNavigate()
   const favs = useFavorites()
   const recents = useRecents()
+  const reduce = useReducedMotion()
   const [query, setQuery] = useState('')
   const [active, setActive] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLElement | null>(null)
 
   const allTools = useMemo(() => buildToolIndex(t), [t])
 
@@ -51,14 +54,21 @@ export function CommandPalette({ open, onClose }: Props) {
   // Reset active index when query or sections change
   useEffect(() => { setActive(0) }, [query, sections])
 
-  // Focus input when opened, reset query when closed
+  // Focus input when opened; restore focus when closed
   useEffect(() => {
     if (open) {
-      setTimeout(() => inputRef.current?.focus(), 50)
-    } else {
-      setQuery('')
-      setActive(0)
+      triggerRef.current = (document.activeElement as HTMLElement) ?? null
+      const id = window.setTimeout(() => inputRef.current?.focus(), 50)
+      return () => window.clearTimeout(id)
     }
+    setQuery('')
+    setActive(0)
+    const trigger = triggerRef.current
+    if (trigger && typeof trigger.focus === 'function') {
+      // Defer so any outside click handling finishes first
+      window.setTimeout(() => trigger.focus(), 0)
+    }
+    triggerRef.current = null
   }, [open])
 
   // Scroll active item into view
@@ -90,16 +100,30 @@ export function CommandPalette({ open, onClose }: Props) {
     }
   }
 
-  if (!open) return null
-
   let runningIndex = -1
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] px-4 bg-black/50" onClick={onClose}>
-      <div
-        className="w-full max-w-xl bg-base-100 rounded-2xl shadow-2xl border border-base-200 overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] px-4 bg-black/50"
+          onClick={onClose}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+        >
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('palette.searchPlaceholder')}
+            className="w-full max-w-xl bg-base-100 rounded-2xl shadow-2xl border border-base-200 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+            initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: -8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.98, y: -4 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 32, mass: 0.9 }}
+          >
         {/* Search input */}
         <div className="flex items-center gap-3 px-5 py-4 border-b border-base-200">
           <Search size={18} className="text-base-content/40 shrink-0" />
@@ -190,7 +214,9 @@ export function CommandPalette({ open, onClose }: Props) {
             {t('palette.tools')}
           </span>
         </div>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }

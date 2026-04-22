@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Download } from '../../icons'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
@@ -24,6 +24,10 @@ export function ImageCompressor() {
   const [result, setResult] = useState<{ dataUrl: string; size: number; filename: string } | null>(null)
   const [loading, setLoading] = useState(false)
   const imgRef = useRef<HTMLImageElement | null>(null)
+
+  useEffect(() => {
+    return () => { if (preview) URL.revokeObjectURL(preview) }
+  }, [preview])
 
   const handleFile = (f: File) => {
     setFile(f)

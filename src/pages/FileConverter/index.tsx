@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Download } from '../../icons'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
@@ -31,12 +31,15 @@ function ImageConverter() {
 
   const webpSupported = supportsWebp()
 
+  useEffect(() => {
+    return () => { if (preview) URL.revokeObjectURL(preview) }
+  }, [preview])
+
   const handleFile = (f: File) => {
     setFile(f)
     setResult(null)
     setError('')
-    const url = URL.createObjectURL(f)
-    setPreview(url)
+    setPreview(URL.createObjectURL(f))
   }
 
   const convert = async () => {
@@ -129,6 +132,7 @@ function DataConverter() {
       const detected = detectDataFormat(text)
       if (detected) setFromFormat(detected)
     }
+    reader.onerror = () => setError(t('files.readFailed'))
     reader.readAsText(f)
   }
 

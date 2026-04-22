@@ -1,4 +1,5 @@
 import { useRef, useState, type DragEvent, type ChangeEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Upload } from '../../icons'
 
 interface FileDropzoneProps {
@@ -8,9 +9,11 @@ interface FileDropzoneProps {
   hint?: string
 }
 
-export function FileDropzone({ accept, onFile, label = 'Drop file here', hint }: FileDropzoneProps) {
+export function FileDropzone({ accept, onFile, label, hint }: FileDropzoneProps) {
+  const { t } = useTranslation()
   const [dragging, setDragging] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const displayLabel = label ?? t('common.dropFileHere')
 
   const handleDrop = (e: DragEvent) => {
     e.preventDefault()
@@ -36,9 +39,9 @@ export function FileDropzone({ accept, onFile, label = 'Drop file here', hint }:
       onDrop={handleDrop}
     >
       <Upload size={24} className="text-base-content/40" />
-      <p className="text-sm font-medium text-base-content/60">{label}</p>
+      <p className="text-sm font-medium text-base-content/60">{displayLabel}</p>
       {hint && <p className="text-xs text-base-content/40">{hint}</p>}
-      <p className="text-xs text-base-content/40">or click to browse</p>
+      <p className="text-xs text-base-content/40">{t('common.dropFile')}</p>
       <input ref={inputRef} type="file" accept={accept} className="hidden" onChange={handleChange} />
     </div>
   )

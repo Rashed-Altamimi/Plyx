@@ -9,7 +9,10 @@ import { CopyButton } from '../../components/ui/CopyButton'
 function decodeBase64Url(str: string): string {
   const base64 = str.replace(/-/g, '+').replace(/_/g, '/')
   const padded = base64 + '=='.slice((base64.length % 4) || 4)
-  return decodeURIComponent(escape(atob(padded)))
+  const binary = atob(padded)
+  const bytes = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
+  return new TextDecoder('utf-8').decode(bytes)
 }
 
 function parseJwt(token: string) {

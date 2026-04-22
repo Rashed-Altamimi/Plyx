@@ -54,6 +54,7 @@ export { ArrowRight }        from '@phosphor-icons/react/dist/csr/ArrowRight'
 export { Ruler }             from '@phosphor-icons/react/dist/csr/Ruler'
 export { Thermometer }       from '@phosphor-icons/react/dist/csr/Thermometer'
 export { Gauge }             from '@phosphor-icons/react/dist/csr/Gauge'
+export { Sparkle }           from '@phosphor-icons/react/dist/csr/Sparkle'
 
 // ---------- Renamed: Lucide name → Phosphor source ----------
 export { Key as KeyRound }                       from '@phosphor-icons/react/dist/csr/Key'

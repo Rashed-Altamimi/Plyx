@@ -11,6 +11,10 @@
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Plyx" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -25,18 +29,17 @@
     <meta name="twitter:image" content="/favicon.svg" />
 
     <!--
-      Anonymous visit counting via GoatCounter.
+      Anonymous visit counting via GoatCounter (https://plyx.goatcounter.com).
       - No cookies, no IP storage, no fingerprinting.
       - Honors Do Not Track automatically.
       - Honors localStorage 'skipgc' flag (toggled by the in-app opt-out).
-      - REPLACE 'YOUR-SUBDOMAIN' below with your actual GoatCounter site name.
       - The script is async + defer-equivalent so it never blocks render.
     -->
     <script>
       window.goatcounter = { no_onload: true };
     </script>
     <script
-      data-goatcounter="https://YOUR-SUBDOMAIN.goatcounter.com/count"
+      data-goatcounter="https://plyx.goatcounter.com/count"
       async
       src="//gc.zgo.at/count.js"
     ></script>

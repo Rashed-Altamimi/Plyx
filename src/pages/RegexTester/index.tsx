@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
+import { useDebounced } from '../../hooks/useDebounced'
 import { Card } from '../../components/ui/Card'
 import { Textarea } from '../../components/ui/Textarea'
 import { Badge } from '../../components/ui/Badge'
@@ -13,41 +14,44 @@ export function RegexTester() {
   const [flags, setFlags] = useState({ g: true, i: false, m: false })
   const [testStr, setTestStr] = useState('')
 
+  const debouncedPattern = useDebounced(pattern, 150)
+  const debouncedTestStr = useDebounced(testStr, 150)
+
   const { error, matches, highlighted } = useMemo(() => {
-    if (!pattern) return { regex: null, error: '', matches: [], highlighted: testStr }
+    if (!debouncedPattern) return { regex: null, error: '', matches: [], highlighted: debouncedTestStr }
     try {
       const f = Object.entries(flags).filter(([, v]) => v).map(([k]) => k).join('')
-      const rx = new RegExp(pattern, f)
+      const rx = new RegExp(debouncedPattern, f)
       const allMatches: RegExpExecArray[] = []
       let m: RegExpExecArray | null
 
-      // Iterate matches
+      const MAX_MATCHES = 10_000
       const g = f.includes('g')
       if (g) {
-        while ((m = rx.exec(testStr)) !== null) {
+        while ((m = rx.exec(debouncedTestStr)) !== null) {
           allMatches.push(m)
-          if (m.index === rx.lastIndex) rx.lastIndex++ // avoid infinite loop on zero-length
+          if (allMatches.length >= MAX_MATCHES) break
+          if (m.index === rx.lastIndex) rx.lastIndex++
         }
       } else {
-        m = rx.exec(testStr)
+        m = rx.exec(debouncedTestStr)
         if (m) allMatches.push(m)
       }
 
-      // Build highlighted HTML (rendered as text with spans via React)
       const parts: Array<{ text: string; match: boolean }> = []
       let last = 0
       for (const match of allMatches) {
-        if (match.index > last) parts.push({ text: testStr.slice(last, match.index), match: false })
+        if (match.index > last) parts.push({ text: debouncedTestStr.slice(last, match.index), match: false })
         parts.push({ text: match[0], match: true })
         last = match.index + match[0].length
       }
-      if (last < testStr.length) parts.push({ text: testStr.slice(last), match: false })
+      if (last < debouncedTestStr.length) parts.push({ text: debouncedTestStr.slice(last), match: false })
 
       return { regex: rx, error: '', matches: allMatches, highlighted: parts }
     } catch (e) {
-      return { regex: null, error: (e as Error).message, matches: [], highlighted: testStr }
+      return { regex: null, error: (e as Error).message, matches: [], highlighted: debouncedTestStr }
     }
-  }, [pattern, flags, testStr])
+  }, [debouncedPattern, flags, debouncedTestStr])
 
   const matchCount = matches.length
 

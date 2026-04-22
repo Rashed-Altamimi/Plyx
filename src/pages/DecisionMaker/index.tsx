@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { X, Plus } from '../../icons'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { Card } from '../../components/ui/Card'
@@ -15,9 +16,11 @@ function securePick<T>(arr: T[]): T {
 export function DecisionMaker() {
   const { t } = useTranslation()
   useDocumentTitle(t('decide.title'))
+  const reduce = useReducedMotion()
   const [mode, setMode] = useState('yesNo')
   const [options, setOptions] = useState<string[]>(['', ''])
   const [result, setResult] = useState<string | null>(null)
+  const [resultId, setResultId] = useState(0)
 
   const TABS = [
     { id: 'yesNo', label: t('decide.yesNo') },
@@ -25,6 +28,7 @@ export function DecisionMaker() {
   ]
 
   const decide = () => {
+    setResultId((n) => n + 1)
     if (mode === 'yesNo') {
       setResult(securePick([t('decide.yes'), t('decide.no')]))
     } else {
@@ -84,12 +88,21 @@ export function DecisionMaker() {
         </Button>
       </Card>
 
-      {result && (
-        <div className="rounded-xl border border-primary/20 bg-primary/10 p-8 text-center">
-          <p className="text-xs text-primary/60 mb-2 font-medium uppercase tracking-wider">{t('decide.resultLabel')}</p>
-          <p className="text-4xl font-bold text-primary">{result}</p>
-        </div>
-      )}
+      <AnimatePresence mode="wait">
+        {result && (
+          <motion.div
+            key={resultId}
+            className="rounded-xl border border-primary/20 bg-primary/10 p-8 text-center"
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ type: 'spring', stiffness: 460, damping: 26 }}
+          >
+            <p className="text-xs text-primary/60 mb-2 font-medium uppercase tracking-wider">{t('decide.resultLabel')}</p>
+            <p className="text-4xl font-bold text-primary">{result}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

@@ -10,8 +10,6 @@ import { useFavorites } from '../../hooks/useFavorites'
 import { useCollapsedCategories } from '../../hooks/useCollapsedCategories'
 import { useCommandPalette } from '../../hooks/useCommandPalette'
 
-const CATEGORY_KEYS = ['converters', 'textTools', 'devTools', 'generators', 'calculators', 'imageTools', 'fun'] as const
-
 export function Sidebar() {
   const { t, i18n } = useTranslation()
   const favs = useFavorites()
@@ -81,13 +79,12 @@ export function Sidebar() {
         )}
 
         {/* Categories */}
-        {NAV_CATEGORIES.map((category, idx) => {
-          const catKey = CATEGORY_KEYS[idx]
-          const isCollapsed = collapsed.isCollapsed(catKey)
+        {NAV_CATEGORIES.map((category) => {
+          const isCollapsed = collapsed.isCollapsed(category.key)
           return (
-            <div key={category.label} className="mt-4">
+            <div key={category.key} className="mt-4">
               <button
-                onClick={() => collapsed.toggle(catKey)}
+                onClick={() => collapsed.toggle(category.key)}
                 className="w-full flex items-center gap-1.5 px-3 mb-1 group cursor-pointer"
               >
                 <ChevronDown
@@ -95,7 +92,7 @@ export function Sidebar() {
                   className={`text-base-content/40 transition-transform ${isCollapsed ? '-rotate-90' : ''}`}
                 />
                 <p className="text-xs font-semibold text-base-content/40 group-hover:text-base-content/60 uppercase tracking-wider">
-                  {t(`navCategories.${catKey}`)}
+                  {t(`navCategories.${category.key}`)}
                 </p>
               </button>
               {!isCollapsed && (

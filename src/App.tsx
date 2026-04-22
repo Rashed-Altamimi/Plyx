@@ -1,7 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { Suspense, lazy } from 'react'
+import { AnimatePresence } from 'motion/react'
 import { AppShell } from './components/layout/AppShell'
 import { ErrorBoundary } from './components/layout/ErrorBoundary'
+import { PageSkeleton } from './components/layout/PageSkeleton'
+import { PageTransition } from './components/layout/PageTransition'
 import { Home } from './pages/Home'
 
 // Converters
@@ -14,6 +17,7 @@ const UnitConverter     = lazy(() => import('./pages/UnitConverter').then(m => (
 const CurrencyConverter = lazy(() => import('./pages/CurrencyConverter').then(m => ({ default: m.CurrencyConverter })))
 const RomanNumerals     = lazy(() => import('./pages/RomanNumerals').then(m => ({ default: m.RomanNumerals })))
 const WorldClock        = lazy(() => import('./pages/WorldClock').then(m => ({ default: m.WorldClock })))
+const UnixTimestamp     = lazy(() => import('./pages/UnixTimestamp').then(m => ({ default: m.UnixTimestamp })))
 
 // Text Tools
 const CaseConverter   = lazy(() => import('./pages/CaseConverter').then(m => ({ default: m.CaseConverter })))
@@ -42,6 +46,8 @@ const UserAgentParser  = lazy(() => import('./pages/UserAgentParser').then(m => 
 const HtmlEntities     = lazy(() => import('./pages/HtmlEntities').then(m => ({ default: m.HtmlEntities })))
 const SubnetCalculator = lazy(() => import('./pages/SubnetCalculator').then(m => ({ default: m.SubnetCalculator })))
 const JsonToTs         = lazy(() => import('./pages/JsonToTs').then(m => ({ default: m.JsonToTs })))
+const QrScanner        = lazy(() => import('./pages/QrScanner').then(m => ({ default: m.QrScanner })))
+const FakeJson         = lazy(() => import('./pages/FakeJson').then(m => ({ default: m.FakeJson })))
 
 // Generators
 const UuidGenerator      = lazy(() => import('./pages/UuidGenerator').then(m => ({ default: m.UuidGenerator })))
@@ -80,21 +86,15 @@ const DiceRoller     = lazy(() => import('./pages/DiceRoller').then(m => ({ defa
 const DecisionMaker  = lazy(() => import('./pages/DecisionMaker').then(m => ({ default: m.DecisionMaker })))
 const EmojiFinder    = lazy(() => import('./pages/EmojiFinder').then(m => ({ default: m.EmojiFinder })))
 
-function PageLoader() {
-  return (
-    <div className="flex items-center justify-center h-40">
-      <div className="w-6 h-6 border-2 border-primary/25 border-t-primary rounded-full animate-spin" />
-    </div>
-  )
-}
-
 function RoutesShell() {
   const location = useLocation()
   return (
     <ErrorBoundary resetKey={location.pathname}>
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
-            <Route path="/" element={<Home />} />
+      <Suspense fallback={<PageSkeleton />}>
+        <AnimatePresence mode="wait" initial={false}>
+          <PageTransition pageKey={location.pathname}>
+            <Routes location={location}>
+              <Route path="/" element={<Home />} />
 
             {/* Converters */}
             <Route path="/password"    element={<PasswordGenerator />} />
@@ -106,6 +106,7 @@ function RoutesShell() {
             <Route path="/currency"    element={<CurrencyConverter />} />
             <Route path="/roman"       element={<RomanNumerals />} />
             <Route path="/world-clock" element={<WorldClock />} />
+            <Route path="/unix-time"   element={<UnixTimestamp />} />
 
             {/* Text Tools */}
             <Route path="/case"         element={<CaseConverter />} />
@@ -134,6 +135,8 @@ function RoutesShell() {
             <Route path="/html-entities" element={<HtmlEntities />} />
             <Route path="/subnet"        element={<SubnetCalculator />} />
             <Route path="/json-ts"       element={<JsonToTs />} />
+            <Route path="/qr-scan"       element={<QrScanner />} />
+            <Route path="/fake-json"     element={<FakeJson />} />
 
             {/* Generators */}
             <Route path="/uuid"       element={<UuidGenerator />} />
@@ -173,9 +176,11 @@ function RoutesShell() {
             <Route path="/emoji"     element={<EmojiFinder />} />
 
             <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
-      </ErrorBoundary>
+            </Routes>
+          </PageTransition>
+        </AnimatePresence>
+      </Suspense>
+    </ErrorBoundary>
   )
 }
 

@@ -1,29 +1,28 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { motion, useReducedMotion, type Variants } from 'motion/react'
 import { Search, Star, Clock } from '../icons'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
-import { NAV_CATEGORIES } from '../constants/navigation'
+import { NAV_CATEGORIES, type NavItem } from '../constants/navigation'
 import { useFavorites } from '../hooks/useFavorites'
 import { useRecents } from '../hooks/useRecents'
 import { useCommandPalette } from '../hooks/useCommandPalette'
 
-const CATEGORY_KEYS = ['converters', 'textTools', 'devTools', 'generators', 'calculators', 'imageTools', 'fun'] as const
+const containerVariants: Variants = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.025, delayChildren: 0.02 },
+  },
+}
 
-const PATH_TO_DESC_KEY: Record<string, string> = {
-  '/password': 'password', '/qr': 'qr', '/datetime': 'datetime', '/files': 'files', '/hijri': 'hijri',
-  '/units': 'units', '/currency': 'currency', '/roman': 'roman', '/world-clock': 'worldClock',
-  '/case': 'case', '/json': 'json', '/word-count': 'wordCount', '/markdown': 'markdown', '/diff': 'diff', '/regex': 'regex',
-  '/sort-lines': 'sortLines', '/find-replace': 'findReplace', '/sql': 'sql', '/yaml': 'yaml', '/morse': 'morse',
-  '/hash': 'hash', '/base64': 'base64', '/url-encode': 'urlEncode', '/jwt': 'jwt', '/cron': 'cron', '/base-convert': 'baseConvert', '/color': 'color',
-  '/http-status': 'httpStatus', '/mime': 'mime', '/user-agent': 'userAgent', '/html-entities': 'htmlEntities', '/subnet': 'subnet', '/json-ts': 'jsonTs',
-  '/uuid': 'uuid', '/lorem': 'lorem', '/random': 'random',
-  '/fake-data': 'fakeData', '/gradient': 'gradient', '/box-shadow': 'boxShadow', '/favicon': 'favicon', '/meta-tags': 'metaTags',
-  '/age': 'age', '/percentage': 'percentage', '/loan': 'loan', '/bmi': 'bmi',
-  '/tip': 'tip', '/date-diff': 'dateDiff', '/duration': 'duration', '/scientific': 'scientific', '/prime': 'prime',
-  '/resize': 'resize', '/compress': 'compress', '/color-pick': 'colorPick',
-  '/crop': 'crop', '/rotate': 'rotate', '/svg-png': 'svgPng', '/exif': 'exif', '/placeholder': 'placeholder',
-  '/coin-flip': 'coinFlip', '/dice': 'dice', '/decide': 'decide', '/emoji': 'emoji',
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 8 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] },
+  },
 }
 
 function ToolCard({ path, iconComponent: Icon, label, description }: {
@@ -33,18 +32,20 @@ function ToolCard({ path, iconComponent: Icon, label, description }: {
   description: string
 }) {
   return (
-    <Link
-      to={path}
-      className="group flex items-start gap-3 rounded-xl border border-base-200 bg-base-100 p-3 shadow-sm hover:border-primary/30 hover:shadow-md transition-all"
-    >
-      <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
-        <Icon size={16} className="text-primary" />
-      </div>
-      <div className="min-w-0">
-        <p className="text-sm font-medium text-base-content truncate">{label}</p>
-        <p className="text-xs text-base-content/50 mt-0.5 truncate">{description}</p>
-      </div>
-    </Link>
+    <motion.div variants={itemVariants} whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} transition={{ duration: 0.18 }}>
+      <Link
+        to={path}
+        className="group flex items-start gap-3 rounded-xl border border-base-200 bg-base-100 p-3 shadow-sm hover:border-primary/30 hover:shadow-md transition-[box-shadow,border-color]"
+      >
+        <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
+          <Icon size={16} className="text-primary" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-base-content truncate">{label}</p>
+          <p className="text-xs text-base-content/50 mt-0.5 truncate">{description}</p>
+        </div>
+      </Link>
+    </motion.div>
   )
 }
 
@@ -54,15 +55,17 @@ function CompactCard({ path, iconComponent: Icon, label }: {
   label: string
 }) {
   return (
-    <Link
-      to={path}
-      className="group flex items-center gap-2.5 rounded-lg border border-base-200 bg-base-100 px-3 py-2 shadow-sm hover:border-primary/30 hover:shadow-md transition-all"
-    >
-      <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
-        <Icon size={13} className="text-primary" />
-      </div>
-      <p className="text-sm font-medium text-base-content truncate">{label}</p>
-    </Link>
+    <motion.div variants={itemVariants} whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} transition={{ duration: 0.18 }}>
+      <Link
+        to={path}
+        className="group flex items-center gap-2.5 rounded-lg border border-base-200 bg-base-100 px-3 py-2 shadow-sm hover:border-primary/30 hover:shadow-md transition-[box-shadow,border-color]"
+      >
+        <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
+          <Icon size={13} className="text-primary" />
+        </div>
+        <p className="text-sm font-medium text-base-content truncate">{label}</p>
+      </Link>
+    </motion.div>
   )
 }
 
@@ -71,6 +74,7 @@ export function Home() {
   const favs = useFavorites()
   const recents = useRecents()
   const { openPalette } = useCommandPalette()
+  const reduce = useReducedMotion()
   useDocumentTitle('')
 
   const allTools = useMemo(() => NAV_CATEGORIES.flatMap((c) => c.items), [])
@@ -118,11 +122,16 @@ export function Home() {
               {t('home.pinned')}
             </h2>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+          <motion.div
+            variants={containerVariants}
+            initial={reduce ? false : 'hidden'}
+            animate="show"
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2"
+          >
             {favItems.map((item) => (
-              <CompactCard key={item.path} path={item.path} iconComponent={item.icon} label={getLabel(t, item.path, item.label)} />
+              <CompactCard key={item.path} path={item.path} iconComponent={item.icon} label={getLabel(t, item)} />
             ))}
-          </div>
+          </motion.div>
         </div>
       )}
 
@@ -135,41 +144,47 @@ export function Home() {
               {t('home.recent')}
             </h2>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+          <motion.div
+            variants={containerVariants}
+            initial={reduce ? false : 'hidden'}
+            animate="show"
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2"
+          >
             {recentItems.map((item) => (
-              <CompactCard key={item.path} path={item.path} iconComponent={item.icon} label={getLabel(t, item.path, item.label)} />
+              <CompactCard key={item.path} path={item.path} iconComponent={item.icon} label={getLabel(t, item)} />
             ))}
-          </div>
+          </motion.div>
         </div>
       )}
 
       {/* All tools grouped by category */}
-      {NAV_CATEGORIES.map((category, idx) => (
-        <div key={category.label} className="mb-8">
+      {NAV_CATEGORIES.map((category) => (
+        <div key={category.key} className="mb-8">
           <h2 className="text-xs font-semibold text-base-content/40 uppercase tracking-wider mb-3">
-            {t(`navCategories.${CATEGORY_KEYS[idx]}`)}
+            {t(`navCategories.${category.key}`)}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-            {category.items.map((item) => {
-              const descKey = PATH_TO_DESC_KEY[item.path]
-              return (
-                <ToolCard
-                  key={item.path}
-                  path={item.path}
-                  iconComponent={item.icon}
-                  label={getLabel(t, item.path, item.label)}
-                  description={descKey ? t(`navDescriptions.${descKey}`) : item.description}
-                />
-              )
-            })}
-          </div>
+          <motion.div
+            variants={containerVariants}
+            initial={reduce ? false : 'hidden'}
+            animate="show"
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"
+          >
+            {category.items.map((item) => (
+              <ToolCard
+                key={item.path}
+                path={item.path}
+                iconComponent={item.icon}
+                label={getLabel(t, item)}
+                description={item.i18nKey ? t(`navDescriptions.${item.i18nKey}`) : item.description}
+              />
+            ))}
+          </motion.div>
         </div>
       ))}
     </div>
   )
 }
 
-function getLabel(t: (key: string) => string, path: string, fallback: string): string {
-  const key = PATH_TO_DESC_KEY[path]
-  return key ? t(`nav.${key}`) : fallback
+function getLabel(t: (key: string) => string, item: NavItem): string {
+  return item.i18nKey ? t(`nav.${item.i18nKey}`) : item.label
 }

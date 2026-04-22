@@ -1,7 +1,8 @@
 import { Component, type ReactNode, type ErrorInfo } from 'react'
+import { withTranslation, type WithTranslation } from 'react-i18next'
 import { AlertTriangle, RefreshCw, Home } from '../../icons'
 
-interface Props {
+interface Props extends WithTranslation {
   children: ReactNode
   /** Reset boundary state when this value changes (e.g. route pathname) */
   resetKey?: string
@@ -11,7 +12,7 @@ interface State {
   error: Error | null
 }
 
-export class ErrorBoundary extends Component<Props, State> {
+class ErrorBoundaryInner extends Component<Props, State> {
   state: State = { error: null }
 
   static getDerivedStateFromError(error: Error): State {
@@ -26,8 +27,6 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     if (typeof console !== 'undefined') {
-      // Surfacing in dev tools is fine — strict-mode and prod will quietly
-      // pass it through here without flooding telemetry (we have none).
       console.error('Tool error:', error, info.componentStack)
     }
   }
@@ -36,6 +35,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.error) {
+      const { t } = this.props
       return (
         <div className="max-w-2xl mx-auto px-6 py-16">
           <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
@@ -43,10 +43,10 @@ export class ErrorBoundary extends Component<Props, State> {
               <AlertTriangle size={20} className="text-red-600" />
             </div>
             <h2 className="text-lg font-semibold text-red-900 mb-2">
-              Something went wrong
+              {t('common.somethingWrong')}
             </h2>
             <p className="text-sm text-red-700 mb-1">
-              This tool ran into an unexpected error.
+              {t('common.unexpectedError')}
             </p>
             <p className="text-xs text-red-600/80 font-mono mb-6 break-all">
               {this.state.error.message}
@@ -57,14 +57,14 @@ export class ErrorBoundary extends Component<Props, State> {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-colors cursor-pointer"
               >
                 <RefreshCw size={14} />
-                Try again
+                {t('common.tryAgain')}
               </button>
               <a
                 href="/"
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-red-200 bg-white text-red-700 text-sm font-medium hover:bg-red-100 transition-colors"
               >
                 <Home size={14} />
-                Back to home
+                {t('common.backHome')}
               </a>
             </div>
           </div>
@@ -74,3 +74,5 @@ export class ErrorBoundary extends Component<Props, State> {
     return this.props.children
   }
 }
+
+export const ErrorBoundary = withTranslation()(ErrorBoundaryInner)

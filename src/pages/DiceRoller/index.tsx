@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Dices } from '../../icons'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { Card } from '../../components/ui/Card'
@@ -14,12 +15,15 @@ function secureRoll(sides: number): number {
 export function DiceRoller() {
   const { t } = useTranslation()
   useDocumentTitle(t('dice.title'))
+  const reduce = useReducedMotion()
   const [count, setCount] = useState(2)
   const [sides, setSides] = useState(6)
   const [rolls, setRolls] = useState<number[]>([])
+  const [rollId, setRollId] = useState(0)
 
   const roll = () => {
     setRolls(Array.from({ length: count }, () => secureRoll(sides)))
+    setRollId((n) => n + 1)
   }
 
   const total = rolls.reduce((sum, r) => sum + r, 0)
@@ -45,23 +49,41 @@ export function DiceRoller() {
         </Button>
       </Card>
 
-      {rolls.length > 0 && (
-        <Card className="space-y-4">
-          <div className="flex flex-wrap justify-center gap-3">
-            {rolls.map((r, i) => (
-              <div
-                key={i}
-                className="w-14 h-14 rounded-xl bg-primary/10 border-2 border-primary/25 flex items-center justify-center text-xl font-bold text-primary"
-              >
-                {r}
+      <AnimatePresence>
+        {rolls.length > 0 && (
+          <motion.div
+            key={rollId}
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Card className="space-y-4">
+              <div className="flex flex-wrap justify-center gap-3">
+                {rolls.map((r, i) => (
+                  <motion.div
+                    key={`${rollId}-${i}`}
+                    initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.5, rotate: -12 }}
+                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 520,
+                      damping: 22,
+                      delay: reduce ? 0 : i * 0.06,
+                    }}
+                    className="w-14 h-14 rounded-xl bg-primary/10 border-2 border-primary/25 flex items-center justify-center text-xl font-bold text-primary tabular-nums"
+                  >
+                    {r}
+                  </motion.div>
+                ))}
               </div>
-            ))}
-          </div>
-          <div className="text-center border-t border-base-200 pt-4">
-            <p className="text-2xl font-bold text-base-content">{t('dice.total', { n: total })}</p>
-          </div>
-        </Card>
-      )}
+              <div className="text-center border-t border-base-200 pt-4">
+                <p className="text-2xl font-bold text-base-content tabular-nums">{t('dice.total', { n: total })}</p>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

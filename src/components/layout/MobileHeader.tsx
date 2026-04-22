@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Menu, X, Wrench, Globe, Search, ChevronDown, Star } from '../../icons'
 import { useTranslation } from 'react-i18next'
 import { HOME_ITEM, NAV_CATEGORIES } from '../../constants/navigation'
@@ -10,14 +11,14 @@ import { useFavorites } from '../../hooks/useFavorites'
 import { useCollapsedCategories } from '../../hooks/useCollapsedCategories'
 import { useCommandPalette } from '../../hooks/useCommandPalette'
 
-const CATEGORY_KEYS = ['converters', 'textTools', 'devTools', 'generators', 'calculators', 'imageTools', 'fun'] as const
-
 export function MobileHeader() {
   const [open, setOpen] = useState(false)
   const { t, i18n } = useTranslation()
   const favs = useFavorites()
   const collapsed = useCollapsedCategories()
   const { openPalette } = useCommandPalette()
+  const reduce = useReducedMotion()
+  const isRtl = i18n.dir() === 'rtl'
 
   const switchLang = () => {
     const currentIdx = LANGUAGES.findIndex((l) => l.code === i18n.language)
@@ -65,11 +66,33 @@ export function MobileHeader() {
         </div>
       </header>
 
-      {open && (
-        <div className="md:hidden fixed inset-0 z-50 bg-black/30" onClick={close} />
-      )}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            key="mobile-drawer-backdrop"
+            className="md:hidden fixed inset-0 z-50 bg-black/30"
+            onClick={close}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+          />
+        )}
+      </AnimatePresence>
 
-      <div className={`md:hidden fixed top-0 z-50 h-full w-72 bg-base-100 shadow-xl mobile-drawer flex flex-col transition-transform duration-200 ${open ? 'open' : ''}`}>
+      <motion.div
+        className="md:hidden fixed top-0 z-50 h-full w-72 bg-base-100 shadow-xl mobile-drawer flex flex-col"
+        initial={false}
+        animate={{
+          x: open ? 0 : (reduce ? 0 : (isRtl ? 288 : -288)),
+          opacity: open || !reduce ? 1 : 0,
+        }}
+        style={{
+          [isRtl ? 'right' : 'left']: 0,
+          pointerEvents: open ? 'auto' : 'none',
+        } as React.CSSProperties}
+        transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 380, damping: 38 }}
+      >
         <div className="flex items-center justify-between px-5 py-4 border-b border-base-200 shrink-0">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
@@ -111,13 +134,12 @@ export function MobileHeader() {
             </div>
           )}
 
-          {NAV_CATEGORIES.map((category, idx) => {
-            const catKey = CATEGORY_KEYS[idx]
-            const isCollapsed = collapsed.isCollapsed(catKey)
+          {NAV_CATEGORIES.map((category) => {
+            const isCollapsed = collapsed.isCollapsed(category.key)
             return (
-              <div key={category.label} className="mt-4">
+              <div key={category.key} className="mt-4">
                 <button
-                  onClick={() => collapsed.toggle(catKey)}
+                  onClick={() => collapsed.toggle(category.key)}
                   className="w-full flex items-center gap-1.5 px-3 mb-1 group cursor-pointer"
                 >
                   <ChevronDown
@@ -125,7 +147,7 @@ export function MobileHeader() {
                     className={`text-base-content/40 transition-transform ${isCollapsed ? '-rotate-90' : ''}`}
                   />
                   <p className="text-xs font-semibold text-base-content/40 group-hover:text-base-content/60 uppercase tracking-wider">
-                    {t(`navCategories.${catKey}`)}
+                    {t(`navCategories.${category.key}`)}
                   </p>
                 </button>
                 {!isCollapsed && (
@@ -153,7 +175,7 @@ export function MobileHeader() {
           </div>
           <AnalyticsToggle />
         </div>
-      </div>
+      </motion.div>
     </>
   )
 }

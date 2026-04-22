@@ -26,11 +26,17 @@ interface RatesData {
 }
 
 async function fetchRates(): Promise<RatesData> {
-  const res = await fetch(API_URL)
-  if (!res.ok) throw new Error('Fetch failed')
-  const json = await res.json()
-  if (!json.rates) throw new Error('Invalid response')
-  return { rates: json.rates, base: 'USD', fetchedAt: Date.now() }
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 10_000)
+  try {
+    const res = await fetch(API_URL, { signal: controller.signal })
+    if (!res.ok) throw new Error('Fetch failed')
+    const json = await res.json()
+    if (!json.rates) throw new Error('Invalid response')
+    return { rates: json.rates, base: 'USD', fetchedAt: Date.now() }
+  } finally {
+    clearTimeout(timer)
+  }
 }
 
 export function CurrencyConverter() {

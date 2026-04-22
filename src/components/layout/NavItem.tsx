@@ -4,80 +4,6 @@ import { Star } from '../../icons'
 import type { NavItem as NavItemType } from '../../constants/navigation'
 import { useFavorites } from '../../hooks/useFavorites'
 
-// Map paths to nav translation keys
-const PATH_TO_KEY: Record<string, string> = {
-  '/': 'home',
-  // Converters
-  '/password': 'password',
-  '/qr': 'qr',
-  '/datetime': 'datetime',
-  '/files': 'files',
-  '/hijri': 'hijri',
-  '/units': 'units',
-  '/currency': 'currency',
-  '/roman': 'roman',
-  '/world-clock': 'worldClock',
-  // Text Tools
-  '/case': 'case',
-  '/json': 'json',
-  '/word-count': 'wordCount',
-  '/markdown': 'markdown',
-  '/diff': 'diff',
-  '/regex': 'regex',
-  '/sort-lines': 'sortLines',
-  '/find-replace': 'findReplace',
-  '/sql': 'sql',
-  '/yaml': 'yaml',
-  '/morse': 'morse',
-  // Dev Tools
-  '/hash': 'hash',
-  '/base64': 'base64',
-  '/url-encode': 'urlEncode',
-  '/jwt': 'jwt',
-  '/cron': 'cron',
-  '/base-convert': 'baseConvert',
-  '/color': 'color',
-  '/http-status': 'httpStatus',
-  '/mime': 'mime',
-  '/user-agent': 'userAgent',
-  '/html-entities': 'htmlEntities',
-  '/subnet': 'subnet',
-  '/json-ts': 'jsonTs',
-  // Generators
-  '/uuid': 'uuid',
-  '/lorem': 'lorem',
-  '/random': 'random',
-  '/fake-data': 'fakeData',
-  '/gradient': 'gradient',
-  '/box-shadow': 'boxShadow',
-  '/favicon': 'favicon',
-  '/meta-tags': 'metaTags',
-  // Calculators
-  '/age': 'age',
-  '/percentage': 'percentage',
-  '/loan': 'loan',
-  '/bmi': 'bmi',
-  '/tip': 'tip',
-  '/date-diff': 'dateDiff',
-  '/duration': 'duration',
-  '/scientific': 'scientific',
-  '/prime': 'prime',
-  // Image Tools
-  '/resize': 'resize',
-  '/compress': 'compress',
-  '/color-pick': 'colorPick',
-  '/crop': 'crop',
-  '/rotate': 'rotate',
-  '/svg-png': 'svgPng',
-  '/exif': 'exif',
-  '/placeholder': 'placeholder',
-  // Fun
-  '/coin-flip': 'coinFlip',
-  '/dice': 'dice',
-  '/decide': 'decide',
-  '/emoji': 'emoji',
-}
-
 interface NavItemProps {
   item: NavItemType
   onClick?: () => void
@@ -87,8 +13,7 @@ export function NavItem({ item, onClick }: NavItemProps) {
   const { t } = useTranslation()
   const favs = useFavorites()
   const Icon = item.icon
-  const key = PATH_TO_KEY[item.path]
-  const label = key ? t(`nav.${key}`) : item.label
+  const label = item.i18nKey ? t(`nav.${item.i18nKey}`) : item.label
   const isHome = item.path === '/'
   const isFav = favs.isFav(item.path)
 

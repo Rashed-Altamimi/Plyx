@@ -30,7 +30,10 @@ export function Base64Tool() {
 
   const encode = () => {
     try {
-      setOutput(btoa(unescape(encodeURIComponent(input))))
+      const bytes = new TextEncoder().encode(input)
+      let bin = ''
+      for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i])
+      setOutput(btoa(bin))
       setError('')
     } catch {
       setError(t('base64.encodingFailed'))
@@ -39,7 +42,10 @@ export function Base64Tool() {
 
   const decode = () => {
     try {
-      setOutput(decodeURIComponent(escape(atob(input.trim()))))
+      const bin = atob(input.trim())
+      const bytes = new Uint8Array(bin.length)
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
+      setOutput(new TextDecoder('utf-8', { fatal: true }).decode(bytes))
       setError('')
     } catch {
       setError(t('base64.invalidBase64'))
@@ -53,6 +59,7 @@ export function Base64Tool() {
       const result = e.target?.result as string
       setFileResult(result)
     }
+    reader.onerror = () => setFileResult('')
     reader.readAsDataURL(file)
   }
 
