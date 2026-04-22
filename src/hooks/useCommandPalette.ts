@@ -10,9 +10,9 @@ function broadcast(next: boolean) {
 
 // Attach the global ⌘K / Ctrl+K listener exactly once at module load time.
 // Previously this lived inside the hook's useEffect, which meant every place
-// that called useCommandPalette() (AppShell, Sidebar, MobileHeader, Home)
-// attached its own listener — a single key press would fire toggle() N times
-// and the even number of flips would cancel out, making the shortcut a no-op.
+// that called useCommandPalette() (AppShell, TopNav, Home) attached its own
+// listener — a single key press would fire toggle() N times and the even
+// number of flips would cancel out, making the shortcut a no-op.
 if (typeof document !== 'undefined') {
   document.addEventListener('keydown', (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {

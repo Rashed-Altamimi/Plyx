@@ -1,32 +1,74 @@
 import { useState, useEffect, useCallback } from 'react'
+import { applyCustomVars, clearCustomVars, getCustomTheme, CUSTOM_PRESETS } from './useCustomTheme'
 
 export type ThemeId = string
 
 const STORAGE_KEY = 'plyx-theme'
-const DEFAULT_THEME: ThemeId = 'plyxDark'
+const DEFAULT_THEME: ThemeId = 'dark'
 
 export const THEMES = [
-  { id: 'plyxDark',   label: 'Plyx Dark',  emoji: '●' },
-  { id: 'plyxLight',  label: 'Plyx Light', emoji: '○' },
-  { id: 'light',      label: 'Light',      emoji: '☀️' },
-  { id: 'dark',       label: 'Dark',       emoji: '🌙' },
-  { id: 'cupcake',    label: 'Cupcake',    emoji: '🧁' },
-  { id: 'corporate',  label: 'Corporate',  emoji: '🏢' },
-  { id: 'emerald',    label: 'Emerald',    emoji: '✳️' },
-  { id: 'synthwave',  label: 'Synthwave',  emoji: '🌆' },
-  { id: 'dracula',    label: 'Dracula',    emoji: '🧛' },
-  { id: 'nord',       label: 'Nord',       emoji: '❄️' },
-  { id: 'sunset',     label: 'Sunset',     emoji: '🌅' },
-  { id: 'retro',      label: 'Retro',      emoji: '📺' },
+  { id: 'dark',   label: 'Dark',   emoji: '●' },
+  { id: 'light',  label: 'Light',  emoji: '○' },
+  { id: 'ocean',  label: 'Ocean',  emoji: '🌊' },
+  { id: 'forest', label: 'Forest', emoji: '🌲' },
+  { id: 'paper',  label: 'Paper',  emoji: '📜' },
+  { id: 'custom', label: 'Custom', emoji: '✦' },
 ] as const
+
+// Valid IDs for quick checks + migration of unknown saved values.
+const VALID_IDS: Set<string> = new Set(THEMES.map((t) => t.id))
+
+// Translate legacy theme IDs so upgraders keep a sensible look.
+const LEGACY_ALIAS: Record<string, ThemeId> = {
+  plyxDark: 'dark',
+  plyxLight: 'light',
+  cupcake: 'light',
+  corporate: 'light',
+  emerald: 'forest',
+  synthwave: 'custom',
+  dracula: 'dark',
+  nord: 'ocean',
+  sunset: 'custom',
+  retro: 'paper',
+}
 
 function getSavedTheme(): ThemeId {
   if (typeof localStorage === 'undefined') return DEFAULT_THEME
-  return localStorage.getItem(STORAGE_KEY) || DEFAULT_THEME
+  const raw = localStorage.getItem(STORAGE_KEY)
+  if (!raw) return DEFAULT_THEME
+  const migrated = LEGACY_ALIAS[raw] ?? (VALID_IDS.has(raw) ? raw : DEFAULT_THEME)
+  if (migrated !== raw) {
+    try { localStorage.setItem(STORAGE_KEY, migrated) } catch { /* storage full */ }
+  }
+  return migrated
 }
 
+/**
+ * Apply a theme:
+ * - `dark` / `light` — native DaisyUI theme, colors come from index.css.
+ * - Any preset (`ocean`, `forest`, `paper`) — layer its colors as inline CSS
+ *   variables over the `dark` / `light` base so widgets still get the right
+ *   scaffolding.
+ * - `custom` — same mechanism, but uses the user's saved colors.
+ */
 function applyTheme(theme: ThemeId) {
-  document.documentElement.setAttribute('data-theme', theme)
+  const root = document.documentElement
+
+  if (theme === 'dark' || theme === 'light') {
+    root.setAttribute('data-theme', theme)
+    clearCustomVars()
+    return
+  }
+
+  const preset = theme === 'custom' ? getCustomTheme() : CUSTOM_PRESETS[theme]
+  if (!preset) {
+    // Unknown theme id — fall back to default
+    root.setAttribute('data-theme', DEFAULT_THEME)
+    clearCustomVars()
+    return
+  }
+  root.setAttribute('data-theme', preset.colorScheme === 'dark' ? 'dark' : 'light')
+  applyCustomVars(preset)
 }
 
 export function useTheme() {

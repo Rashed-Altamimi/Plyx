@@ -8,21 +8,11 @@
  */
 
 @plugin "daisyui" {
-  themes:
-    light,
-    dark,
-    cupcake,
-    corporate,
-    emerald,
-    synthwave,
-    dracula,
-    nord,
-    sunset,
-    retro;
+  themes: false;
 }
 
 @plugin "daisyui/theme" {
-  name: "plyxDark";
+  name: "dark";
   default: true;
   prefersdark: true;
   color-scheme: dark;
@@ -64,7 +54,7 @@
 }
 
 @plugin "daisyui/theme" {
-  name: "plyxLight";
+  name: "light";
   color-scheme: light;
 
   --color-base-100: oklch(99% 0.002 285);
@@ -206,6 +196,23 @@
     border-left: 1px solid var(--ink-6);
   }
 
+  /* Flip the scrollbar to the outer screen edge of the sidebar.
+   * Browsers paint the scrollbar on the "end" side of a scroll container,
+   * so we locally reverse direction on the scroller and restore it on the
+   * children, keeping content flow intact but moving the scrollbar. */
+  .scrollbar-outer {
+    direction: rtl;
+  }
+  .scrollbar-outer > * {
+    direction: ltr;
+  }
+  [dir="rtl"] .scrollbar-outer {
+    direction: ltr;
+  }
+  [dir="rtl"] .scrollbar-outer > * {
+    direction: rtl;
+  }
+
   .bg-dot-grid {
     background-image: radial-gradient(var(--ink-6) 1px, transparent 1px);
     background-size: 22px 22px;
@@ -270,22 +277,33 @@
     color: var(--color-base-content);
   }
 
-  /* Scrollbar */
+  /* Scrollbar — slim, no arrows */
   ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 6px;
+    height: 6px;
+  }
+  /* Remove default arrow buttons on browsers that render them */
+  ::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
   }
   ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-corner {
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
     background: var(--ink-10);
     border-radius: 6px;
-    border: 2px solid transparent;
-    background-clip: padding-box;
   }
   ::-webkit-scrollbar-thumb:hover {
     background: var(--ink-20);
-    background-clip: padding-box;
+  }
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--ink-10) transparent;
   }
 }

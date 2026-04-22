@@ -27,18 +27,12 @@ const ar = {
   },
 
   themes: {
-    plyxDark: "Plyx داكن",
-    plyxLight: "Plyx فاتح",
-    light: "فاتح",
     dark: "داكن",
-    cupcake: "كب كيك",
-    corporate: "مؤسسي",
-    emerald: "زمردي",
-    synthwave: "سنثويف",
-    dracula: "دراكولا",
-    nord: "نورد",
-    sunset: "غروب",
-    retro: "كلاسيكي",
+    light: "فاتح",
+    ocean: "محيط",
+    forest: "غابة",
+    paper: "ورق",
+    custom: "مخصّص",
   },
 
   nav: {
@@ -240,6 +234,44 @@ const ar = {
     language: "اللغة",
     analyticsHint:
       "عدّ مجهول للزيارات. بدون ملفات تعريف ارتباط، بدون تخزين عنوان IP. يمكنك الإلغاء.",
+    customizeTheme: "تخصيص المظهر…",
+  },
+
+  themeEditor: {
+    title: "محرّر المظهر",
+    subtitle: "اختر ألوانك الخاصة مع معاينة فورية للتطبيق بالكامل.",
+    close: "إغلاق",
+    startFrom: "ابدأ من",
+    colorScheme: "نظام الألوان",
+    colorSchemeHint: "يؤثر على عناصر المتصفح وشريط التمرير.",
+    autoContent: "تباين تلقائي للنص على ألوان العلامة",
+    preview: "معاينة",
+    previewHeading: "كل شيء هنا يستخدم ألوانك",
+    previewSurface: "السطح · بطاقة base-200 مع محتوى تجريبي.",
+    reset: "استعادة الافتراضي",
+    randomize: "عشوائي",
+    cancel: "إلغاء",
+    save: "حفظ المظهر",
+    scheme: {
+      light: "فاتح",
+      dark: "داكن",
+    },
+    groups: {
+      surfaces: "الأسطح والنص",
+      brand: "ألوان العلامة",
+    },
+    fields: {
+      base100: "الخلفية",
+      base200: "السطح",
+      base300: "المرتفع",
+      baseContent: "النص",
+      primary: "الأساسي",
+      primaryContent: "النص على الأساسي",
+      secondary: "الثانوي",
+      secondaryContent: "النص على الثانوي",
+      accent: "الإبراز",
+      accentContent: "النص على الإبراز",
+    },
   },
 
   sidebar: {

@@ -27,18 +27,12 @@ const en = {
   },
 
   themes: {
-    plyxDark: "Plyx Dark",
-    plyxLight: "Plyx Light",
-    light: "Light",
     dark: "Dark",
-    cupcake: "Cupcake",
-    corporate: "Corporate",
-    emerald: "Emerald",
-    synthwave: "Synthwave",
-    dracula: "Dracula",
-    nord: "Nord",
-    sunset: "Sunset",
-    retro: "Retro",
+    light: "Light",
+    ocean: "Ocean",
+    forest: "Forest",
+    paper: "Paper",
+    custom: "Custom",
   },
 
   nav: {
@@ -247,6 +241,44 @@ const en = {
     language: "Language",
     analyticsHint:
       "Anonymous pageview counting. No cookies, no IP storage. You can opt out.",
+    customizeTheme: "Customize theme…",
+  },
+
+  themeEditor: {
+    title: "Theme editor",
+    subtitle: "Pick your own colors. Live preview on the whole app.",
+    close: "Close",
+    startFrom: "Start from",
+    colorScheme: "Color scheme",
+    colorSchemeHint: "Affects native widgets and scrollbars.",
+    autoContent: "Auto-contrast text on brand colors",
+    preview: "Preview",
+    previewHeading: "Everything here uses your colors",
+    previewSurface: "Surface · base-200 card with sample content.",
+    reset: "Reset to default",
+    randomize: "Randomize",
+    cancel: "Cancel",
+    save: "Save theme",
+    scheme: {
+      light: "Light",
+      dark: "Dark",
+    },
+    groups: {
+      surfaces: "Surfaces & text",
+      brand: "Brand colors",
+    },
+    fields: {
+      base100: "Background",
+      base200: "Surface",
+      base300: "Elevated",
+      baseContent: "Text",
+      primary: "Primary",
+      primaryContent: "Text on primary",
+      secondary: "Secondary",
+      secondaryContent: "Text on secondary",
+      accent: "Accent",
+      accentContent: "Text on accent",
+    },
   },
 
   sidebar: {
