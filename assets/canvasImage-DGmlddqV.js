@@ -1,0 +1,1 @@
+function e(e){return new Promise((t,n)=>{let r=URL.createObjectURL(e),i=new Image;i.onload=()=>{URL.revokeObjectURL(r),t(i)},i.onerror=()=>{URL.revokeObjectURL(r),n(Error(`Failed to load image`))},i.src=r})}function t(e,t){let n=document.createElement(`a`);n.href=e,n.download=t,n.click()}export{e as n,t};

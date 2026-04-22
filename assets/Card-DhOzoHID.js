@@ -1,0 +1,1 @@
+import{n as e}from"./useDocumentTitle-CWS4biPB.js";var t=e();function n({children:e,className:n=``,...r}){return(0,t.jsx)(`div`,{className:`rounded-xl border border-base-content/[0.06] bg-base-200/40 backdrop-blur-sm p-5 shadow-[inset_0_1px_0_0_color-mix(in_oklab,var(--color-base-content)_4%,transparent)] ${n}`,...r,children:e})}export{n as t};

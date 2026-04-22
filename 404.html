@@ -1,63 +1,102 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Plyx — 62 browser-based utility tools</title>
-    <meta name="description" content="A collection of 62 utility tools that run entirely in your browser. Password generator, QR code, JSON formatter, color picker, and more. Your tool data stays on your device." />
-    <meta name="theme-color" content="#2563eb" />
-    <meta name="color-scheme" content="light dark" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="icon" type="image/svg+xml" href="/Plyx/favicon.svg" />
-    <link rel="apple-touch-icon" href="/Plyx/favicon.svg" />
-    <link rel="manifest" href="manifest.webmanifest" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="Plyx" />
+  <title>Plyx — 74 browser-based utility tools</title>
+  <meta name="description"
+    content="A collection of 74 utility tools that run entirely in your browser. Password generator, QR code, JSON formatter, color picker, and more. Your data stays on your device." />
+  <meta name="theme-color" content="#7c6cfa" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="author" content="Rashed Altamimi" />
+  <link rel="canonical" href="https://rashed-altamimi.github.io/Plyx/" />
 
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Plyx — 62 browser-based utility tools" />
-    <meta property="og:description" content="Password, QR, JSON, color, image, hash, base64, and 56 more — all running in your browser." />
-    <meta property="og:image" content="/Plyx/favicon.svg" />
+  <link rel="icon" type="image/svg+xml" href="/Plyx/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/Plyx/favicon.ico" />
+  <link rel="apple-touch-icon" href="/Plyx/apple-touch-icon-180x180.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
 
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Plyx — 62 browser-based utility tools" />
-    <meta name="twitter:description" content="Password, QR, JSON, color, image, hash, base64, and 56 more — all running in your browser." />
-    <meta name="twitter:image" content="/Plyx/favicon.svg" />
+  <!-- Fonts: Geist (UI + display) + Geist Mono (code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Plyx" />
 
-    <!--
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Plyx" />
+  <meta property="og:title" content="Plyx — 74 browser-based utility tools" />
+  <meta property="og:description"
+    content="Password, QR, JSON, color, image, hash, base64, and 58 more — all running in your browser." />
+  <meta property="og:image" content="https://rashed-altamimi.github.io/Plyx/pwa-512x512.png" />
+  <meta property="og:url" content="https://rashed-altamimi.github.io/Plyx/" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Plyx — 74 browser-based utility tools" />
+  <meta name="twitter:description"
+    content="Password, QR, JSON, color, image, hash, base64, and 58 more — all running in your browser." />
+  <meta name="twitter:image" content="https://rashed-altamimi.github.io/Plyx/pwa-512x512.png" />
+
+  <!-- Structured data: WebApplication -->
+  <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Plyx",
+        "description": "A collection of 74 utility tools that run entirely in your browser.",
+        "url": "https://rashed-altamimi.github.io/Plyx/",
+        "applicationCategory": "UtilityApplication",
+        "operatingSystem": "Any",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "isAccessibleForFree": true,
+        "browserRequirements": "Requires JavaScript. Requires HTML5.",
+        "featureList": "Password generator, QR code, JSON formatter, color picker, image tools, calculators, and 60+ more.",
+        "inLanguage": ["en", "ar"]
+      }
+    </script>
+
+  <!--
       Anonymous visit counting via GoatCounter (https://plyx.goatcounter.com).
       - No cookies, no IP storage, no fingerprinting.
       - Honors Do Not Track automatically.
       - Honors localStorage 'skipgc' flag (toggled by the in-app opt-out).
       - The script is async + defer-equivalent so it never blocks render.
     -->
-    <script>
-      window.goatcounter = { no_onload: true };
-    </script>
-    <script
-      data-goatcounter="https://plyx.goatcounter.com/count"
-      async
-      src="//gc.zgo.at/count.js"
-    ></script>
-    <script type="module" crossorigin src="/Plyx/assets/index-rWYna0Mi.js"></script>
-    <link rel="modulepreload" crossorigin href="/Plyx/assets/useDocumentTitle-CHAQJCZG.js">
-    <link rel="modulepreload" crossorigin href="/Plyx/assets/IconBase.es-CXtAEm6l.js">
-    <link rel="modulepreload" crossorigin href="/Plyx/assets/ArrowClockwise.es-BRPv965-.js">
-    <link rel="modulepreload" crossorigin href="/Plyx/assets/ArrowsLeftRight.es-CnjxRSI2.js">
-    <link rel="modulepreload" crossorigin href="/Plyx/assets/Square.es-B7JG337H.js">
-    <link rel="modulepreload" crossorigin href="/Plyx/assets/DiceFive.es-BSzjaWk5.js">
-    <link rel="modulepreload" crossorigin href="/Plyx/assets/Shuffle.es-D5VfQBwq.js">
-    <link rel="modulepreload" crossorigin href="/Plyx/assets/X.es-DPfPtt5X.js">
-    <link rel="modulepreload" crossorigin href="/Plyx/assets/use-reduced-motion-B1jn-SZR.js">
-    <link rel="modulepreload" crossorigin href="/Plyx/assets/AnimatePresence-BMcn2bur.js">
-    <link rel="stylesheet" crossorigin href="/Plyx/assets/index-BWEQcKwt.css">
-  </head>
-  <body>
-    <div id="root"></div>
-    <noscript>Plyx requires JavaScript to run. Please enable it in your browser.</noscript>
-  </body>
+  <script>
+    window.goatcounter = { no_onload: true };
+  </script>
+  <script data-goatcounter="https://plyx.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  <script type="module" crossorigin src="/Plyx/assets/index-C1DdQdBM.js"></script>
+  <link rel="modulepreload" crossorigin href="/Plyx/assets/chunk-zsgVPwQN.js">
+  <link rel="modulepreload" crossorigin href="/Plyx/assets/preload-helper-CpdHltiR.js">
+  <link rel="modulepreload" crossorigin href="/Plyx/assets/useDocumentTitle-CWS4biPB.js">
+  <link rel="modulepreload" crossorigin href="/Plyx/assets/IconBase.es-mHSL6EKa.js">
+  <link rel="modulepreload" crossorigin href="/Plyx/assets/Tooltip-Dnt5_6eC.js">
+  <link rel="modulepreload" crossorigin href="/Plyx/assets/ArrowClockwise.es-C4iiA00W.js">
+  <link rel="modulepreload" crossorigin href="/Plyx/assets/ArrowsLeftRight.es-C-iD5SfG.js">
+  <link rel="modulepreload" crossorigin href="/Plyx/assets/Square.es-CURI2v2L.js">
+  <link rel="modulepreload" crossorigin href="/Plyx/assets/DiceFive.es-yyBTBZTV.js">
+  <link rel="modulepreload" crossorigin href="/Plyx/assets/Shuffle.es-CdEalwph.js">
+  <link rel="modulepreload" crossorigin href="/Plyx/assets/X.es-ViE3AgHo.js">
+  <link rel="modulepreload" crossorigin href="/Plyx/assets/use-reduced-motion-7lDJV0Or.js">
+  <link rel="modulepreload" crossorigin href="/Plyx/assets/AnimatePresence-ELBAqVFY.js">
+  <link rel="stylesheet" crossorigin href="/Plyx/assets/index-ArPBM8sz.css">
+<script id="vite-plugin-pwa:register-sw" src="/Plyx/registerSW.js"></script></head>
+
+<body>
+  <div id="root"></div>
+  <noscript>Plyx requires JavaScript to run. Please enable it in your browser.</noscript>
+</body>
+
 </html>
