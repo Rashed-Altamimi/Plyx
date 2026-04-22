@@ -13,6 +13,7 @@ import {
   DEFAULT_CUSTOM_THEME,
   type CustomTheme,
 } from '../../hooks/useCustomTheme'
+import { updateFavicon } from '../../utils/dynamicFavicon'
 import { useTheme } from '../../hooks/useTheme'
 import { Button } from '../ui/Button'
 import { parseHex } from '../../utils/palette'
@@ -89,6 +90,7 @@ export function ThemeEditor({ open, onClose }: Props) {
   useEffect(() => {
     if (!open) return
     applyCustomVars(draft)
+    updateFavicon()
   }, [draft, open])
 
   const patch = (key: keyof CustomTheme, value: string) => {
@@ -125,6 +127,7 @@ export function ThemeEditor({ open, onClose }: Props) {
     } else {
       clearCustomVars()
     }
+    updateFavicon()
     onClose()
   }
 

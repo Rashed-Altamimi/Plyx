@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { applyCustomVars, clearCustomVars, getCustomTheme, CUSTOM_PRESETS } from './useCustomTheme'
+import { updateFavicon } from '../utils/dynamicFavicon'
 
 export type ThemeId = string
 
@@ -57,18 +58,19 @@ function applyTheme(theme: ThemeId) {
   if (theme === 'dark' || theme === 'light') {
     root.setAttribute('data-theme', theme)
     clearCustomVars()
-    return
+  } else {
+    const preset = theme === 'custom' ? getCustomTheme() : CUSTOM_PRESETS[theme]
+    if (!preset) {
+      root.setAttribute('data-theme', DEFAULT_THEME)
+      clearCustomVars()
+    } else {
+      root.setAttribute('data-theme', preset.colorScheme === 'dark' ? 'dark' : 'light')
+      applyCustomVars(preset)
+    }
   }
 
-  const preset = theme === 'custom' ? getCustomTheme() : CUSTOM_PRESETS[theme]
-  if (!preset) {
-    // Unknown theme id — fall back to default
-    root.setAttribute('data-theme', DEFAULT_THEME)
-    clearCustomVars()
-    return
-  }
-  root.setAttribute('data-theme', preset.colorScheme === 'dark' ? 'dark' : 'light')
-  applyCustomVars(preset)
+  // Push the new brand colors into the tab icon + browser chrome
+  updateFavicon()
 }
 
 export function useTheme() {
