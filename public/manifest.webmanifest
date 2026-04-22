@@ -1,5 +1,5 @@
 {
-  "name": "Plyx — 65 browser-based utility tools",
+  "name": "Plyx — 74 browser-based utility tools",
   "short_name": "Plyx",
   "description": "A collection of utility tools that run entirely in your browser. Password generator, QR code, JSON formatter, color picker, and 60+ more.",
   "start_url": ".",
@@ -8,7 +8,11 @@
   "orientation": "any",
   "background_color": "#09090b",
   "theme_color": "#7c6cfa",
-  "categories": ["utilities", "productivity", "developer"],
+  "categories": [
+    "utilities",
+    "productivity",
+    "developer"
+  ],
   "icons": [
     {
       "src": "pwa-64x64.png",
