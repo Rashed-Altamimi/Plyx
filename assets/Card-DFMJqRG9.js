@@ -1,0 +1,1 @@
+import{n as e}from"./useDocumentTitle-CHAQJCZG.js";var t=e();function n({children:e,className:n=``,...r}){return(0,t.jsx)(`div`,{className:`rounded-xl border border-base-200 bg-base-100 p-5 shadow-sm ${n}`,...r,children:e})}export{n as t};
