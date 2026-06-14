@@ -9,6 +9,7 @@ import { Select } from '../../components/ui/Select'
 import { Slider } from '../../components/ui/Slider'
 import { Button } from '../../components/ui/Button'
 import { Textarea } from '../../components/ui/Textarea'
+import { Checkbox } from '../../components/ui/Checkbox'
 import { CopyButton } from '../../components/ui/CopyButton'
 import {
   convertImage,
@@ -18,6 +19,7 @@ import {
   type ImageFormat,
   type DataFormat,
 } from '../../utils/fileConverter'
+import { xlsxToData, dataToXlsx } from '../../utils/xlsxConverter'
 
 function ImageConverter() {
   const { t } = useTranslation()
@@ -116,59 +118,106 @@ function ImageConverter() {
   )
 }
 
+type FileFormat = DataFormat | 'xlsx'
+
+const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+const FORMAT_OPTIONS: { value: FileFormat; label: string }[] = [
+  { value: 'json', label: 'JSON' },
+  { value: 'csv',  label: 'CSV' },
+  { value: 'tsv',  label: 'TSV' },
+  { value: 'xml',  label: 'XML' },
+  { value: 'xlsx', label: 'XLSX (Excel)' },
+]
+
+function triggerDownload(blob: Blob, filename: string) {
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(a.href)
+}
+
 function DataConverter() {
   const { t } = useTranslation()
   const [input, setInput] = useState('')
-  const [fromFormat, setFromFormat] = useState<DataFormat>('json')
-  const [toFormat, setToFormat] = useState<DataFormat>('csv')
+  const [fromFormat, setFromFormat] = useState<FileFormat>('json')
+  const [toFormat, setToFormat] = useState<FileFormat>('csv')
   const [output, setOutput] = useState('')
+  const [xlsxIn, setXlsxIn] = useState<{ buffer: ArrayBuffer; name: string } | null>(null)
+  const [xlsxOut, setXlsxOut] = useState<Uint8Array | null>(null)
+  const [hasHeader, setHasHeader] = useState(true)
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const resetResults = () => { setOutput(''); setXlsxOut(null); setError('') }
 
   const handleFile = (f: File) => {
+    resetResults()
+    const isXlsx = /\.xlsx?$/i.test(f.name) || f.type.includes('spreadsheet')
     const reader = new FileReader()
-    reader.onload = (e) => {
-      const text = e.target?.result as string
-      setInput(text)
-      const detected = detectDataFormat(text)
-      if (detected) setFromFormat(detected)
+    if (isXlsx) {
+      reader.onload = (e) => {
+        setXlsxIn({ buffer: e.target?.result as ArrayBuffer, name: f.name })
+        setFromFormat('xlsx')
+        setInput('')
+      }
+      reader.onerror = () => setError(t('files.readFailed'))
+      reader.readAsArrayBuffer(f)
+    } else {
+      const ext = f.name.split('.').pop()?.toLowerCase()
+      reader.onload = (e) => {
+        const text = e.target?.result as string
+        setInput(text)
+        setXlsxIn(null)
+        const detected = ext === 'tsv' || ext === 'tab' ? 'tsv' : detectDataFormat(text)
+        if (detected) setFromFormat(detected)
+      }
+      reader.onerror = () => setError(t('files.readFailed'))
+      reader.readAsText(f)
     }
-    reader.onerror = () => setError(t('files.readFailed'))
-    reader.readAsText(f)
   }
 
-  const convert = () => {
-    setError('')
-    setOutput('')
+  const convert = async () => {
+    resetResults()
+    setLoading(true)
     try {
-      const result = convertData(input.trim(), fromFormat, toFormat)
-      setOutput(result)
+      if (fromFormat === 'xlsx') {
+        if (!xlsxIn) throw new Error(t('files.needXlsx'))
+        if (toFormat === 'xlsx') setXlsxOut(new Uint8Array(xlsxIn.buffer))
+        else setOutput(await xlsxToData(xlsxIn.buffer, toFormat, hasHeader))
+      } else if (toFormat === 'xlsx') {
+        setXlsxOut(await dataToXlsx(input.trim(), fromFormat, hasHeader))
+      } else {
+        setOutput(convertData(input.trim(), fromFormat, toFormat, hasHeader))
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Conversion failed')
+    } finally {
+      setLoading(false)
     }
   }
 
-  const download = () => {
-    const ext = toFormat === 'json' ? 'json' : toFormat === 'csv' ? 'csv' : 'xml'
-    const mime = toFormat === 'json' ? 'application/json' : toFormat === 'csv' ? 'text/csv' : 'application/xml'
-    const blob = new Blob([output], { type: mime })
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = `converted.${ext}`
-    a.click()
-    URL.revokeObjectURL(a.href)
+  const downloadText = () => {
+    const ext = toFormat === 'json' ? 'json' : toFormat === 'csv' ? 'csv' : toFormat === 'tsv' ? 'tsv' : 'xml'
+    const mime =
+      toFormat === 'json' ? 'application/json'
+      : toFormat === 'csv' ? 'text/csv'
+      : toFormat === 'tsv' ? 'text/tab-separated-values'
+      : 'application/xml'
+    triggerDownload(new Blob([output], { type: mime }), `converted.${ext}`)
   }
 
-  const FORMAT_OPTIONS: { value: DataFormat; label: string }[] = [
-    { value: 'json', label: 'JSON' },
-    { value: 'csv',  label: 'CSV' },
-    { value: 'xml',  label: 'XML' },
-  ]
+  const downloadXlsx = () => {
+    if (!xlsxOut) return
+    triggerDownload(new Blob([new Uint8Array(xlsxOut)], { type: XLSX_MIME }), 'converted.xlsx')
+  }
 
   return (
     <div className="space-y-4">
       <Card>
         <FileDropzone
-          accept=".json,.csv,.xml,.txt"
+          accept=".json,.csv,.tsv,.tab,.xml,.txt,.xlsx,.xls"
           onFile={handleFile}
           label={t('files.dropData')}
           hint={t('files.dataHint')}
@@ -176,41 +225,78 @@ function DataConverter() {
       </Card>
 
       <Card className="space-y-4">
-        <Textarea
-          label="Input"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Paste or drop your data here…"
-          rows={8}
-          className="font-mono text-xs"
-        />
+        {fromFormat === 'xlsx' ? (
+          <div className="flex flex-col gap-1.5">
+            <span className="text-xs font-medium text-base-content/60 tracking-wide">{t('common.input')}</span>
+            {xlsxIn ? (
+              <div className="flex items-center justify-between gap-3 rounded-lg border border-base-content/10 bg-base-100/60 px-3 py-2.5">
+                <span className="text-sm text-base-content/80 truncate">{xlsxIn.name}</span>
+                <Button variant="ghost" size="sm" onClick={() => { setXlsxIn(null); setFromFormat('json'); resetResults() }}>
+                  {t('common.change')}
+                </Button>
+              </div>
+            ) : (
+              <p className="text-sm text-base-content/50 rounded-lg border border-dashed border-base-content/15 px-3 py-3">
+                {t('files.needXlsx')}
+              </p>
+            )}
+          </div>
+        ) : (
+          <Textarea
+            label={t('common.input')}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Paste or drop your data here…"
+            rows={8}
+            className="font-mono text-xs"
+          />
+        )}
 
         <div className="grid grid-cols-2 gap-4">
-          <Select label={t('files.from')} value={fromFormat} onChange={(e) => setFromFormat(e.target.value as DataFormat)}>
+          <Select label={t('files.from')} value={fromFormat} onChange={(e) => { setFromFormat(e.target.value as FileFormat); resetResults() }}>
             {FORMAT_OPTIONS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
           </Select>
-          <Select label={t('files.to')} value={toFormat} onChange={(e) => setToFormat(e.target.value as DataFormat)}>
+          <Select label={t('files.to')} value={toFormat} onChange={(e) => { setToFormat(e.target.value as FileFormat); resetResults() }}>
             {FORMAT_OPTIONS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
           </Select>
         </div>
 
-        <Button onClick={convert} className="w-full">{t('common.convert')}</Button>
+        <Checkbox
+          label={t('files.hasHeader')}
+          checked={hasHeader}
+          onChange={(e) => { setHasHeader(e.target.checked); resetResults() }}
+        />
+
+        <Button onClick={convert} disabled={loading} className="w-full">
+          {loading ? t('files.converting') : t('common.convert')}
+        </Button>
         {error && <p className="text-sm text-red-500">{error}</p>}
       </Card>
 
-      {output && (
-        <Card className="space-y-3">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-base-content/70">{t('common.output')}</p>
-            <div className="flex gap-2">
-              <CopyButton text={output} />
-              <Button variant="outline" size="sm" onClick={download}>
-                <Download size={14} /> {t('common.download')}
-              </Button>
+      {toFormat === 'xlsx' ? (
+        xlsxOut && (
+          <Card className="space-y-3">
+            <p className="text-sm font-medium text-base-content/70">{t('files.xlsxReady')}</p>
+            <Button variant="outline" onClick={downloadXlsx} className="w-full">
+              <Download size={14} /> converted.xlsx
+            </Button>
+          </Card>
+        )
+      ) : (
+        output && (
+          <Card className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-base-content/70">{t('common.output')}</p>
+              <div className="flex gap-2">
+                <CopyButton text={output} />
+                <Button variant="outline" size="sm" onClick={downloadText}>
+                  <Download size={14} /> {t('common.download')}
+                </Button>
+              </div>
             </div>
-          </div>
-          <Textarea value={output} readOnly rows={10} className="font-mono text-xs" />
-        </Card>
+            <Textarea value={output} readOnly rows={10} className="font-mono text-xs" />
+          </Card>
+        )
       )}
     </div>
   )

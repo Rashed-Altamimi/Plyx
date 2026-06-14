@@ -43,7 +43,8 @@
     "sql-formatter": "^15.7.3",
     "tailwindcss": "^4.2.2",
     "tesseract.js": "^7.0.0",
-    "ua-parser-js": "^2.0.9"
+    "ua-parser-js": "^2.0.9",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

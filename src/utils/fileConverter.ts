@@ -1,7 +1,7 @@
 import Papa from 'papaparse'
 
 export type ImageFormat = 'image/png' | 'image/jpeg' | 'image/webp'
-export type DataFormat = 'json' | 'csv' | 'xml'
+export type DataFormat = 'json' | 'csv' | 'xml' | 'tsv'
 
 export function supportsWebp(): boolean {
   const canvas = document.createElement('canvas')
@@ -50,47 +50,47 @@ export async function convertImage(
 
 export function detectDataFormat(text: string): DataFormat | null {
   const trimmed = text.trim()
+  if (!trimmed) return null
   if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
     try { JSON.parse(trimmed); return 'json' } catch { /* not json */ }
   }
   if (trimmed.startsWith('<')) return 'xml'
-  if (trimmed.length > 0) return 'csv'
-  return null
+  const firstLine = trimmed.split('\n', 1)[0]
+  if (firstLine.includes('\t')) return 'tsv'
+  return 'csv'
 }
 
-export function csvToJson(csv: string): string {
-  const result = Papa.parse(csv, { header: true, skipEmptyLines: true })
-  return JSON.stringify(result.data, null, 2)
+function escapeXml(value: unknown): string {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
 }
 
-export function jsonToCsv(json: string): string {
-  const data = JSON.parse(json)
-  const arr = Array.isArray(data) ? data : [data]
-  return Papa.unparse(arr)
+/** Coerce a column name into a valid XML element name (must start with a letter/underscore). */
+function sanitizeXmlTag(name: string, fallback: string): string {
+  const cleaned = String(name).trim().replace(/[^A-Za-z0-9_.-]/g, '_')
+  return /^[A-Za-z_]/.test(cleaned) ? cleaned : fallback
 }
 
-export function jsonToXml(json: string, rootTag = 'root', itemTag = 'item'): string {
-  const data = JSON.parse(json)
-  const arr = Array.isArray(data) ? data : [data]
+function arrayToXml(rows: unknown[], rootTag = 'root', itemTag = 'item'): string {
   const lines: string[] = [`<?xml version="1.0" encoding="UTF-8"?>`, `<${rootTag}>`]
-  for (const item of arr) {
+  for (const row of rows) {
     lines.push(`  <${itemTag}>`)
-    for (const [key, val] of Object.entries(item ?? {})) {
-      const escaped = String(val ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      lines.push(`    <${key}>${escaped}</${key}>`)
+    if (Array.isArray(row)) {
+      row.forEach((val, i) => lines.push(`    <column_${i + 1}>${escapeXml(val)}</column_${i + 1}>`))
+    } else if (row && typeof row === 'object') {
+      for (const [key, val] of Object.entries(row)) {
+        const tag = sanitizeXmlTag(key, 'field')
+        lines.push(`    <${tag}>${escapeXml(val)}</${tag}>`)
+      }
+    } else {
+      lines.push(`    <value>${escapeXml(row)}</value>`)
     }
     lines.push(`  </${itemTag}>`)
   }
   lines.push(`</${rootTag}>`)
   return lines.join('\n')
-}
-
-export function xmlToJson(xml: string): string {
-  const parser = new DOMParser()
-  const doc = parser.parseFromString(xml, 'application/xml')
-  const parserError = doc.querySelector('parsererror')
-  if (parserError) throw new Error('Invalid XML: ' + parserError.textContent)
-  return JSON.stringify(nodeToObject(doc.documentElement), null, 2)
 }
 
 function nodeToObject(node: Element): unknown {
@@ -111,21 +111,48 @@ function nodeToObject(node: Element): unknown {
   return result
 }
 
-export function csvToXml(csv: string): string {
-  return jsonToXml(csvToJson(csv))
+function xmlToRows(xml: string): unknown[] {
+  const doc = new DOMParser().parseFromString(xml, 'application/xml')
+  const parserError = doc.querySelector('parsererror')
+  if (parserError) throw new Error('Invalid XML: ' + parserError.textContent)
+  const parsed = nodeToObject(doc.documentElement)
+  // A <root><item>…</item></root> document parses to { item: [...] }; unwrap that
+  // single wrapper key into the row list. A flat record stays a single row.
+  if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+    const values = Object.values(parsed as Record<string, unknown>)
+    if (values.length === 1) {
+      const only = values[0]
+      return Array.isArray(only) ? only : [only]
+    }
+  }
+  return Array.isArray(parsed) ? parsed : [parsed]
 }
 
-export function xmlToCsv(xml: string): string {
-  return jsonToCsv(xmlToJson(xml))
+/** Parse a text payload into a list of rows (objects when `header`, else string arrays). */
+export function parseRows(input: string, format: DataFormat, header: boolean): unknown[] {
+  const text = input.trim()
+  if (!text) return []
+  if (format === 'json') {
+    const parsed = JSON.parse(text)
+    return Array.isArray(parsed) ? parsed : [parsed]
+  }
+  if (format === 'xml') return xmlToRows(text)
+  const result = Papa.parse(text, {
+    header,
+    skipEmptyLines: true,
+    ...(format === 'tsv' ? { delimiter: '\t' } : {}),
+  })
+  return result.data as unknown[]
 }
 
-export function convertData(input: string, from: DataFormat, to: DataFormat): string {
+/** Serialize a list of rows into the target text format. */
+export function serializeRows(rows: unknown[], format: DataFormat, header: boolean): string {
+  if (format === 'json') return JSON.stringify(rows, null, 2)
+  if (format === 'xml') return arrayToXml(rows)
+  return Papa.unparse(rows, { header, ...(format === 'tsv' ? { delimiter: '\t' } : {}) })
+}
+
+export function convertData(input: string, from: DataFormat, to: DataFormat, header = true): string {
   if (from === to) return input
-  if (from === 'csv'  && to === 'json') return csvToJson(input)
-  if (from === 'json' && to === 'csv')  return jsonToCsv(input)
-  if (from === 'json' && to === 'xml')  return jsonToXml(input)
-  if (from === 'xml'  && to === 'json') return xmlToJson(input)
-  if (from === 'csv'  && to === 'xml')  return csvToXml(input)
-  if (from === 'xml'  && to === 'csv')  return xmlToCsv(input)
-  return input
+  return serializeRows(parseRows(input, from, header), to, header)
 }
