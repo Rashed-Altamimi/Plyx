@@ -5,17 +5,24 @@
 export type Prim = 'string' | 'number' | 'integer' | 'boolean' | 'null' | 'any'
 
 export type FieldShape =
-  | { kind: 'prim'; type: Prim }
-  | { kind: 'array'; items: FieldShape }
-  | { kind: 'object'; ref: string }
+  | { kind: 'prim'; type: Prim; nullable?: boolean }
+  | { kind: 'array'; items: FieldShape; nullable?: boolean }
+  | { kind: 'object'; ref: string; nullable?: boolean }
+
+export interface NamedField {
+  name: string
+  shape: FieldShape
+  optional?: boolean
+}
 
 export interface NamedType {
   name: string
-  fields: { name: string; shape: FieldShape }[]
+  fields: NamedField[]
 }
 
 export interface Schema {
   root: FieldShape
+  rootName: string
   types: NamedType[]
 }
 
@@ -32,15 +39,23 @@ export const LANGUAGES: { id: Language; label: string }[] = [
 
 // -----------------------------------------------------------------------------
 // Schema inference
+//
+// Two passes. First infer an anonymous shape tree, merging every object seen at
+// the same position (array elements, same field across siblings) into a single
+// shape — fields missing on one side become optional, nulls make the other side
+// nullable. Then a naming pass assigns type names, reusing one name for
+// structurally identical objects so the output never contains duplicate classes.
 // -----------------------------------------------------------------------------
 
 function pascalCase(s: string): string {
-  return s
+  const out = s
     .replace(/[^a-zA-Z0-9]+/g, ' ')
     .trim()
     .split(/\s+/)
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join('') || 'Root'
+    .join('')
+  if (!out) return 'Root'
+  return /^\d/.test(out) ? `_${out}` : out
 }
 
 function singularize(name: string): string {
@@ -51,82 +66,153 @@ function singularize(name: string): string {
 }
 
 function inferPrim(v: unknown): Prim {
-  if (v === null) return 'null'
   if (typeof v === 'string') return 'string'
   if (typeof v === 'number') return Number.isInteger(v) ? 'integer' : 'number'
   if (typeof v === 'boolean') return 'boolean'
   return 'any'
 }
 
-// Merge two shapes for the same position (e.g. array elements or fields).
-// Widen to `any` on incompatibility. Integers widen to numbers.
-function mergeShape(a: FieldShape, b: FieldShape): FieldShape {
-  if (a.kind !== b.kind) {
-    if (a.kind === 'prim' && b.kind === 'prim') {
-      // unreachable: same kind covered above — keep TS happy
-      return a
-    }
-    return { kind: 'prim', type: 'any' }
-  }
-  if (a.kind === 'prim' && b.kind === 'prim') {
-    if (a.type === b.type) return a
-    if (a.type === 'null') return b
-    if (b.type === 'null') return a
-    if ((a.type === 'integer' && b.type === 'number') || (a.type === 'number' && b.type === 'integer')) {
-      return { kind: 'prim', type: 'number' }
-    }
-    return { kind: 'prim', type: 'any' }
-  }
-  if (a.kind === 'array' && b.kind === 'array') {
-    return { kind: 'array', items: mergeShape(a.items, b.items) }
-  }
-  if (a.kind === 'object' && b.kind === 'object') {
-    // Keep the first ref; merge happens at NamedType level.
-    return a
-  }
-  return { kind: 'prim', type: 'any' }
-}
+// 'unknown' marks positions with no information yet (items of an empty array);
+// unlike 'any' it merges as identity instead of poisoning the other side.
+type RawPrim = Prim | 'unknown'
 
-function nameFor(base: string, types: Map<string, NamedType>): string {
-  if (!types.has(base)) return base
-  let i = 2
-  while (types.has(`${base}${i}`)) i++
-  return `${base}${i}`
-}
+interface RawField { shape: RawShape; optional: boolean }
 
-interface InferCtx {
-  types: Map<string, NamedType>
-}
+type RawShape =
+  | { kind: 'prim'; type: RawPrim; nullable?: boolean }
+  | { kind: 'array'; items: RawShape; nullable?: boolean }
+  | { kind: 'obj'; fields: Map<string, RawField>; nullable?: boolean }
 
-function inferValue(value: unknown, suggestedName: string, ctx: InferCtx): FieldShape {
+function inferRaw(value: unknown): RawShape {
   if (value === null) return { kind: 'prim', type: 'null' }
   if (Array.isArray(value)) {
-    if (value.length === 0) return { kind: 'array', items: { kind: 'prim', type: 'any' } }
-    let items = inferValue(value[0], singularize(suggestedName), ctx)
-    for (let i = 1; i < value.length; i++) {
-      items = mergeShape(items, inferValue(value[i], singularize(suggestedName), ctx))
+    let items: RawShape | null = null
+    for (const el of value) {
+      const s = inferRaw(el)
+      items = items ? mergeRaw(items, s) : s
     }
-    return { kind: 'array', items }
+    return { kind: 'array', items: items ?? { kind: 'prim', type: 'unknown' } }
   }
   if (typeof value === 'object') {
-    const obj = value as Record<string, unknown>
-    const base = pascalCase(suggestedName)
-    const typeName = nameFor(base, ctx.types)
-    const fields: NamedType['fields'] = []
-    // Reserve name slot so nested objects can find it
-    ctx.types.set(typeName, { name: typeName, fields })
-    for (const key of Object.keys(obj)) {
-      fields.push({ name: key, shape: inferValue(obj[key], key, ctx) })
+    const fields = new Map<string, RawField>()
+    for (const [key, v] of Object.entries(value as Record<string, unknown>)) {
+      fields.set(key, { shape: inferRaw(v), optional: false })
     }
-    return { kind: 'object', ref: typeName }
+    return { kind: 'obj', fields }
   }
   return { kind: 'prim', type: inferPrim(value) }
 }
 
+function isNull(s: RawShape): boolean {
+  return s.kind === 'prim' && s.type === 'null'
+}
+
+function markNullable(s: RawShape): RawShape {
+  if (s.kind === 'prim' && (s.type === 'null' || s.type === 'any')) return s
+  return { ...s, nullable: true }
+}
+
+function withNull(s: RawShape, nullable: boolean | undefined): RawShape {
+  return nullable ? markNullable(s) : s
+}
+
+// Merge two shapes seen at the same position. Incompatible kinds widen to
+// `any`; integers widen to numbers; null makes the other side nullable.
+function mergeRaw(a: RawShape, b: RawShape): RawShape {
+  if (isNull(a)) return markNullable(b)
+  if (isNull(b)) return markNullable(a)
+  if (a.kind === 'prim' && a.type === 'unknown') return withNull(b, a.nullable)
+  if (b.kind === 'prim' && b.type === 'unknown') return withNull(a, b.nullable)
+  const nullable = a.nullable || b.nullable
+  if (a.kind === 'prim' && b.kind === 'prim') {
+    if (a.type === b.type) return withNull(a, nullable)
+    if ((a.type === 'integer' && b.type === 'number') || (a.type === 'number' && b.type === 'integer')) {
+      return withNull({ kind: 'prim', type: 'number' }, nullable)
+    }
+    return { kind: 'prim', type: 'any' }
+  }
+  if (a.kind === 'array' && b.kind === 'array') {
+    return withNull({ kind: 'array', items: mergeRaw(a.items, b.items) }, nullable)
+  }
+  if (a.kind === 'obj' && b.kind === 'obj') {
+    const fields = new Map<string, RawField>()
+    for (const [key, fa] of a.fields) {
+      const fb = b.fields.get(key)
+      if (fb) {
+        fields.set(key, { shape: mergeRaw(fa.shape, fb.shape), optional: fa.optional || fb.optional })
+      } else {
+        fields.set(key, { ...fa, optional: true })
+      }
+    }
+    for (const [key, fb] of b.fields) {
+      if (!a.fields.has(key)) fields.set(key, { ...fb, optional: true })
+    }
+    return withNull({ kind: 'obj', fields }, nullable)
+  }
+  return { kind: 'prim', type: 'any' }
+}
+
+function nameFor(base: string, used: Set<string>): string {
+  if (!used.has(base)) return base
+  let i = 2
+  while (used.has(`${base}${i}`)) i++
+  return `${base}${i}`
+}
+
+interface NameCtx {
+  used: Set<string>
+  bySig: Map<string, string>
+  types: NamedType[]
+}
+
+function shapeSig(s: FieldShape): string {
+  const n = s.nullable ? '?' : ''
+  if (s.kind === 'prim') return `p:${s.type}${n}`
+  if (s.kind === 'array') return `a:${shapeSig(s.items)}${n}`
+  return `o:${s.ref}${n}`
+}
+
+function resolveShape(s: RawShape, suggested: string, ctx: NameCtx): FieldShape {
+  if (s.kind === 'prim') {
+    const type: Prim = s.type === 'unknown' ? 'any' : s.type
+    return s.nullable && type !== 'any' && type !== 'null'
+      ? { kind: 'prim', type, nullable: true }
+      : { kind: 'prim', type }
+  }
+  if (s.kind === 'array') {
+    const items = resolveShape(s.items, singularize(suggested), ctx)
+    return s.nullable ? { kind: 'array', items, nullable: true } : { kind: 'array', items }
+  }
+  // Name the object before its children so types come out in top-down order,
+  // then drop it again if an identical structure was already named.
+  const name = nameFor(pascalCase(suggested), ctx.used)
+  ctx.used.add(name)
+  const named: NamedType = { name, fields: [] }
+  ctx.types.push(named)
+  for (const [key, f] of s.fields) {
+    const shape = resolveShape(f.shape, key, ctx)
+    named.fields.push(f.optional ? { name: key, shape, optional: true } : { name: key, shape })
+  }
+  const sig = JSON.stringify(named.fields.map((f) => [f.name, shapeSig(f.shape), !!f.optional]).sort())
+  const existing = ctx.bySig.get(sig)
+  if (existing !== undefined) {
+    ctx.used.delete(name)
+    ctx.types.splice(ctx.types.indexOf(named), 1)
+    return s.nullable ? { kind: 'object', ref: existing, nullable: true } : { kind: 'object', ref: existing }
+  }
+  ctx.bySig.set(sig, name)
+  return s.nullable ? { kind: 'object', ref: name, nullable: true } : { kind: 'object', ref: name }
+}
+
 export function inferSchema(value: unknown, rootName = 'Root'): Schema {
-  const ctx: InferCtx = { types: new Map() }
-  const root = inferValue(value, rootName, ctx)
-  return { root, types: Array.from(ctx.types.values()) }
+  const raw = inferRaw(value)
+  const ctx: NameCtx = { used: new Set(), bySig: new Map(), types: [] }
+  const rootPc = pascalCase(rootName)
+  // When the root is not an object the generators emit a `rootName` alias for
+  // it — reserve the name so no nested type takes it.
+  if (raw.kind !== 'obj') ctx.used.add(rootPc)
+  const root = resolveShape(raw, rootName, ctx)
+  return { root, rootName: rootPc, types: ctx.types }
 }
 
 // -----------------------------------------------------------------------------
@@ -143,163 +229,226 @@ function camelCase(s: string): string {
 }
 
 function snakeCase(s: string): string {
-  return s
+  const out = s
     .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
     .replace(/[^a-zA-Z0-9]+/g, '_')
     .toLowerCase()
     .replace(/^_|_$/g, '')
+  if (!out) return 'field'
+  return /^\d/.test(out) ? `_${out}` : out
 }
 
 // TypeScript ------------------------------------------------------------------
 
+const TS_IDENT = /^[A-Za-z_$][A-Za-z0-9_$]*$/
+
+function tsFieldName(name: string): string {
+  return TS_IDENT.test(name) ? name : JSON.stringify(name)
+}
+
 function tsType(shape: FieldShape): string {
+  let base: string
   if (shape.kind === 'prim') {
-    if (shape.type === 'integer') return 'number'
-    if (shape.type === 'null') return 'null'
-    if (shape.type === 'any') return 'any'
-    return shape.type
+    base = shape.type === 'integer' ? 'number' : shape.type
+  } else if (shape.kind === 'array') {
+    const items = tsType(shape.items)
+    base = /[ |]/.test(items) ? `(${items})[]` : `${items}[]`
+  } else {
+    base = shape.ref
   }
-  if (shape.kind === 'array') return `${tsType(shape.items)}[]`
-  return shape.ref
+  if (shape.nullable && base !== 'any' && base !== 'null') base += ' | null'
+  return base
 }
 
 export function toTypeScript(schema: Schema): string {
-  if (schema.types.length === 0) {
-    return `export type Root = ${tsType(schema.root)}\n`
+  const blocks: string[] = []
+  if (schema.root.kind !== 'object') {
+    blocks.push(`export type ${schema.rootName} = ${tsType(schema.root)}`)
   }
-  const blocks = schema.types.map((t) => {
-    const lines = t.fields.map((f) => `  ${f.name}: ${tsType(f.shape)}`)
-    return `export interface ${t.name} {\n${lines.join('\n')}\n}`
-  })
+  for (const t of schema.types) {
+    const lines = t.fields.map((f) => `  ${tsFieldName(f.name)}${f.optional ? '?' : ''}: ${tsType(f.shape)}`)
+    blocks.push(lines.length ? `export interface ${t.name} {\n${lines.join('\n')}\n}` : `export interface ${t.name} {}`)
+  }
   return joinTypes(blocks)
 }
 
 // C# --------------------------------------------------------------------------
 
 function csType(shape: FieldShape): string {
+  let base: string
   if (shape.kind === 'prim') {
     switch (shape.type) {
-      case 'string': return 'string'
-      case 'integer': return 'long'
-      case 'number': return 'double'
-      case 'boolean': return 'bool'
-      case 'null': return 'object?'
-      default: return 'object'
+      case 'string': base = 'string'; break
+      case 'integer': base = 'long'; break
+      case 'number': base = 'double'; break
+      case 'boolean': base = 'bool'; break
+      case 'null': base = 'object?'; break
+      default: base = 'object'
     }
+  } else if (shape.kind === 'array') {
+    base = `List<${csType(shape.items)}>`
+  } else {
+    base = shape.ref
   }
-  if (shape.kind === 'array') return `List<${csType(shape.items)}>`
-  return shape.ref
+  if (shape.nullable && !base.endsWith('?')) base += '?'
+  return base
 }
 
 export function toCSharp(schema: Schema): string {
-  if (schema.types.length === 0) return `// using System.Collections.Generic;\n`
   const blocks = schema.types.map((t) => {
     const props = t.fields.map((f) => {
       const propName = pascalCase(f.name)
       const attr = propName !== f.name ? `    [JsonPropertyName("${f.name}")]\n` : ''
-      return `${attr}    public ${csType(f.shape)} ${propName} { get; set; }`
+      let type = csType(f.shape)
+      if (f.optional && !type.endsWith('?')) type += '?'
+      return `${attr}    public ${type} ${propName} { get; set; }`
     })
-    return `public class ${t.name}\n{\n${props.join('\n\n')}\n}`
+    return props.length
+      ? `public class ${t.name}\n{\n${props.join('\n\n')}\n}`
+      : `public class ${t.name}\n{\n}`
   })
+  if (schema.root.kind !== 'object') {
+    blocks.unshift(`// ${schema.rootName}: ${csType(schema.root)}`)
+  }
   const header = `// using System.Collections.Generic;\n// using System.Text.Json.Serialization;\n\n`
   return header + joinTypes(blocks)
 }
 
 // Java ------------------------------------------------------------------------
 
+const JAVA_BOX: Record<string, string> = { long: 'Long', double: 'Double', boolean: 'Boolean' }
+
 function javaType(shape: FieldShape): string {
+  let base: string
   if (shape.kind === 'prim') {
     switch (shape.type) {
-      case 'string': return 'String'
-      case 'integer': return 'long'
-      case 'number': return 'double'
-      case 'boolean': return 'boolean'
-      case 'null': return 'Object'
-      default: return 'Object'
+      case 'string': base = 'String'; break
+      case 'integer': base = 'long'; break
+      case 'number': base = 'double'; break
+      case 'boolean': base = 'boolean'; break
+      default: base = 'Object'
     }
+  } else if (shape.kind === 'array') {
+    base = `List<${javaBoxed(shape.items)}>`
+  } else {
+    base = shape.ref
   }
-  if (shape.kind === 'array') return `List<${javaBoxed(shape.items)}>`
-  return shape.ref
+  if (shape.nullable) base = JAVA_BOX[base] ?? base
+  return base
 }
 
 function javaBoxed(shape: FieldShape): string {
   const t = javaType(shape)
-  const box: Record<string, string> = { long: 'Long', double: 'Double', boolean: 'Boolean' }
-  return box[t] ?? t
+  return JAVA_BOX[t] ?? t
 }
 
 export function toJava(schema: Schema): string {
-  if (schema.types.length === 0) return `// import java.util.List;\n`
   const blocks = schema.types.map((t) => {
-    const fields = t.fields.map((f) => `    private ${javaType(f.shape)} ${camelCase(f.name)};`)
+    const fields = t.fields.map((f) => {
+      const varName = camelCase(f.name)
+      const attr = varName !== f.name ? `    @JsonProperty("${f.name}")\n` : ''
+      const type = f.optional ? javaBoxed(f.shape) : javaType(f.shape)
+      return `${attr}    private ${type} ${varName};`
+    })
     const accessors = t.fields.flatMap((f) => {
       const getter = pascalCase(f.name)
       const varName = camelCase(f.name)
-      const type = javaType(f.shape)
+      const type = f.optional ? javaBoxed(f.shape) : javaType(f.shape)
       return [
         `    public ${type} get${getter}() { return ${varName}; }`,
         `    public void set${getter}(${type} ${varName}) { this.${varName} = ${varName}; }`,
       ]
     })
-    return `public class ${t.name} {\n${fields.join('\n')}\n\n${accessors.join('\n')}\n}`
+    return fields.length
+      ? `public class ${t.name} {\n${fields.join('\n')}\n\n${accessors.join('\n')}\n}`
+      : `public class ${t.name} {\n}`
   })
-  const header = `// import java.util.List;\n\n`
+  if (schema.root.kind !== 'object') {
+    blocks.unshift(`// ${schema.rootName}: ${javaType(schema.root)}`)
+  }
+  const needsJsonProperty = schema.types.some((t) => t.fields.some((f) => camelCase(f.name) !== f.name))
+  const header = `// import java.util.List;\n${needsJsonProperty ? '// import com.fasterxml.jackson.annotation.JsonProperty;\n' : ''}\n`
   return header + joinTypes(blocks)
 }
 
 // Python ----------------------------------------------------------------------
 
 function pyType(shape: FieldShape): string {
+  let base: string
   if (shape.kind === 'prim') {
     switch (shape.type) {
-      case 'string': return 'str'
-      case 'integer': return 'int'
-      case 'number': return 'float'
-      case 'boolean': return 'bool'
-      case 'null': return 'None'
-      default: return 'Any'
+      case 'string': base = 'str'; break
+      case 'integer': base = 'int'; break
+      case 'number': base = 'float'; break
+      case 'boolean': base = 'bool'; break
+      case 'null': base = 'None'; break
+      default: base = 'Any'
     }
+  } else if (shape.kind === 'array') {
+    base = `List[${pyType(shape.items)}]`
+  } else {
+    base = shape.ref
   }
-  if (shape.kind === 'array') return `List[${pyType(shape.items)}]`
-  return shape.ref
+  if (shape.nullable && base !== 'None' && base !== 'Any') base = `Optional[${base}]`
+  return base
 }
 
 export function toPython(schema: Schema): string {
-  if (schema.types.length === 0) return `from dataclasses import dataclass\n`
   const blocks = schema.types.map((t) => {
-    const fields = t.fields.map((f) => `    ${snakeCase(f.name)}: ${pyType(f.shape)}`)
-    return `@dataclass\nclass ${t.name}:\n${fields.join('\n')}`
+    const fields = t.fields.map((f) => {
+      let type = pyType(f.shape)
+      if (f.optional && !type.startsWith('Optional[') && type !== 'None' && type !== 'Any') {
+        type = `Optional[${type}]`
+      }
+      return `    ${snakeCase(f.name)}: ${type}`
+    })
+    return `@dataclass\nclass ${t.name}:\n${fields.length ? fields.join('\n') : '    pass'}`
   })
-  const header = `from dataclasses import dataclass\nfrom typing import Any, List\n\n`
+  if (schema.root.kind !== 'object') {
+    blocks.push(`${schema.rootName} = ${pyType(schema.root)}`)
+  }
+  const header = `from __future__ import annotations\n\nfrom dataclasses import dataclass\nfrom typing import Any, List, Optional\n\n`
   return header + joinTypes(blocks)
 }
 
 // Go --------------------------------------------------------------------------
 
 function goType(shape: FieldShape): string {
+  let base: string
   if (shape.kind === 'prim') {
     switch (shape.type) {
-      case 'string': return 'string'
-      case 'integer': return 'int64'
-      case 'number': return 'float64'
-      case 'boolean': return 'bool'
-      case 'null': return 'interface{}'
-      default: return 'interface{}'
+      case 'string': base = 'string'; break
+      case 'integer': base = 'int64'; break
+      case 'number': base = 'float64'; break
+      case 'boolean': base = 'bool'; break
+      default: base = 'interface{}'
     }
+  } else if (shape.kind === 'array') {
+    base = `[]${goType(shape.items)}`
+  } else {
+    base = shape.ref
   }
-  if (shape.kind === 'array') return `[]${goType(shape.items)}`
-  return shape.ref
+  if (shape.nullable && base !== 'interface{}' && !base.startsWith('*')) base = `*${base}`
+  return base
 }
 
 export function toGo(schema: Schema): string {
-  if (schema.types.length === 0) return `package main\n`
   const blocks = schema.types.map((t) => {
     const fields = t.fields.map((f) => {
-      const goName = pascalCase(f.name)
-      return `    ${goName} ${goType(f.shape)} \`json:"${f.name}"\``
+      // A leading underscore would make the field unexported and invisible to
+      // encoding/json.
+      const goName = pascalCase(f.name).replace(/^_/, 'X')
+      let type = goType(f.shape)
+      if (f.optional && type !== 'interface{}' && !type.startsWith('*')) type = `*${type}`
+      return `    ${goName} ${type} \`json:"${f.name}${f.optional ? ',omitempty' : ''}"\``
     })
-    return `type ${t.name} struct {\n${fields.join('\n')}\n}`
+    return fields.length
+      ? `type ${t.name} struct {\n${fields.join('\n')}\n}`
+      : `type ${t.name} struct {}`
   })
+  if (schema.root.kind !== 'object') {
+    blocks.unshift(`type ${schema.rootName} ${goType(schema.root)}`)
+  }
   const header = `package main\n\n`
   return header + joinTypes(blocks)
 }
@@ -307,30 +456,41 @@ export function toGo(schema: Schema): string {
 // Rust ------------------------------------------------------------------------
 
 function rustType(shape: FieldShape): string {
+  let base: string
   if (shape.kind === 'prim') {
     switch (shape.type) {
-      case 'string': return 'String'
-      case 'integer': return 'i64'
-      case 'number': return 'f64'
-      case 'boolean': return 'bool'
-      case 'null': return 'Option<serde_json::Value>'
-      default: return 'serde_json::Value'
+      case 'string': base = 'String'; break
+      case 'integer': base = 'i64'; break
+      case 'number': base = 'f64'; break
+      case 'boolean': base = 'bool'; break
+      case 'null': base = 'Option<serde_json::Value>'; break
+      default: base = 'serde_json::Value'
     }
+  } else if (shape.kind === 'array') {
+    base = `Vec<${rustType(shape.items)}>`
+  } else {
+    base = shape.ref
   }
-  if (shape.kind === 'array') return `Vec<${rustType(shape.items)}>`
-  return shape.ref
+  if (shape.nullable && !base.startsWith('Option<')) base = `Option<${base}>`
+  return base
 }
 
 export function toRust(schema: Schema): string {
-  if (schema.types.length === 0) return `use serde::{Deserialize, Serialize};\n`
   const blocks = schema.types.map((t) => {
     const fields = t.fields.map((f) => {
       const rustName = snakeCase(f.name)
       const rename = rustName !== f.name ? `    #[serde(rename = "${f.name}")]\n` : ''
-      return `${rename}    pub ${rustName}: ${rustType(f.shape)},`
+      let type = rustType(f.shape)
+      if (f.optional && !type.startsWith('Option<')) type = `Option<${type}>`
+      return `${rename}    pub ${rustName}: ${type},`
     })
-    return `#[derive(Debug, Serialize, Deserialize)]\npub struct ${t.name} {\n${fields.join('\n')}\n}`
+    return fields.length
+      ? `#[derive(Debug, Serialize, Deserialize)]\npub struct ${t.name} {\n${fields.join('\n')}\n}`
+      : `#[derive(Debug, Serialize, Deserialize)]\npub struct ${t.name} {}`
   })
+  if (schema.root.kind !== 'object') {
+    blocks.unshift(`pub type ${schema.rootName} = ${rustType(schema.root)};`)
+  }
   const header = `use serde::{Deserialize, Serialize};\n\n`
   return header + joinTypes(blocks)
 }
